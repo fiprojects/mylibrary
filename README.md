@@ -1,4 +1,5 @@
 TODO
+====
 
-customerUpdate: znovu načíst z databáze
-roztrhat exceptions
+* **customerUpdate:** znovu načíst z databáze
+* roztrhat exceptions
