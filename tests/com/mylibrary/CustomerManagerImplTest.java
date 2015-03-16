@@ -30,10 +30,9 @@ public class CustomerManagerImplTest {
 
         Long customerId = customer.getId();
         assertNotNull(customerId);
-
         Customer testedCustomer = customerManager.findCustomerById(customerId);
-        assertEquals(customerId, testedCustomer.getId());
-        assertCustomerEqualsWithoutId(customer, testedCustomer);
+
+        assertCustomerEquals(customer, testedCustomer);
     }
 
     @Test
@@ -61,45 +60,53 @@ public class CustomerManagerImplTest {
         customer.setIdCard("DE54321");
         testedCustomer.setIdCard("DE54321");
         customerManager.updateCustomer(testedCustomer);
-        assertCustomerEqualsWithoutId(customer, testedCustomer);
+
+        testedCustomer = customerManager.findCustomerById(customerId);
+        assertCustomerEquals(customer, testedCustomer);
 
         // Name
         testedCustomer = customerManager.findCustomerById(customerId);
         customer.setName("Jana Nováková");
         testedCustomer.setName("Jana Nováková");
         customerManager.updateCustomer(testedCustomer);
-        assertCustomerEqualsWithoutId(customer, testedCustomer);
+
+        testedCustomer = customerManager.findCustomerById(customerId);
+        assertCustomerEquals(customer, testedCustomer);
 
         // Address
         testedCustomer = customerManager.findCustomerById(customerId);
         customer.setAddress("Pražská 10, 111 11 Novákovice");
         testedCustomer.setAddress("Pražská 10, 111 11 Novákovice");
         customerManager.updateCustomer(testedCustomer);
-        assertCustomerEqualsWithoutId(customer, testedCustomer);
+
+        testedCustomer = customerManager.findCustomerById(customerId);
+        assertCustomerEquals(customer, testedCustomer);
 
         // Telephone
         testedCustomer = customerManager.findCustomerById(customerId);
         customer.setTelephone("+421 987 654 321");
         testedCustomer.setTelephone("+421 987 654 321");
         customerManager.updateCustomer(testedCustomer);
-        assertCustomerEqualsWithoutId(customer, testedCustomer);
+
+        testedCustomer = customerManager.findCustomerById(customerId);
+        assertCustomerEquals(customer, testedCustomer);
 
         // E-mail
         testedCustomer = customerManager.findCustomerById(customerId);
         customer.setEmail("email@jan.novak.cz");
         testedCustomer.setEmail("email@jan.novak.cz");
         customerManager.updateCustomer(testedCustomer);
-        assertCustomerEqualsWithoutId(customer, testedCustomer);
 
-        assertCustomerEqualsWithoutId(anotherCustomer, customerManager.findCustomerById(anotherCustomerId));
+        testedCustomer = customerManager.findCustomerById(customerId);
+        assertCustomerEquals(customer, testedCustomer);
+
+        // Another customer must be untouched
+        assertCustomerEquals(anotherCustomer, customerManager.findCustomerById(anotherCustomerId));
     }
 
-    @Test
-    public void updateCustomerIncorrect() throws Exception {
-        try {
-            customerManager.updateCustomer(null);
-            fail();
-        } catch(IllegalArgumentException e) {}
+    @Test(expected = IllegalArgumentException.class)
+    public void updateCustomerIncorrect() {
+        customerManager.updateCustomer(null);
     }
 
     @Test
@@ -127,12 +134,9 @@ public class CustomerManagerImplTest {
         assertNotNull(customerManager.findCustomerById(customer2.getId()));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void deleteCustomerInvalid() throws Exception {
-        try {
-            customerManager.deleteCustomer(null);
-            fail();
-        } catch(IllegalArgumentException e) {}
+        customerManager.deleteCustomer(null);
     }
 
     @Test
@@ -168,7 +172,7 @@ public class CustomerManagerImplTest {
             Customer c2 = tested.get(i);
 
             assertEquals(c1.getId(), c2.getId());
-            assertCustomerEqualsWithoutId(c1, c2);
+            assertCustomerEquals(c1, c2);
         }
     }
 
@@ -186,7 +190,7 @@ public class CustomerManagerImplTest {
         Customer testedCustomer = customerManager.findCustomerById(customerId);
         assertNotNull(testedCustomer);
         assertEquals(customerId, testedCustomer.getId());
-        assertCustomerEqualsWithoutId(customer, testedCustomer);
+        assertCustomerEquals(customer, testedCustomer);
     }
 
     @Test
@@ -203,27 +207,17 @@ public class CustomerManagerImplTest {
         Customer testedCustomer = customerManager.findCustomerByName("Norman Novotný");
         assertNotNull(testedCustomer);
         assertEquals(customerId, testedCustomer.getId());
-        assertCustomerEqualsWithoutId(customer, testedCustomer);
+        assertCustomerEquals(customer, testedCustomer);
     }
 
 
-    private void assertCustomerEqualsWithoutId(Customer customer1, Customer customer2) {
+    private void assertCustomerEquals(Customer customer1, Customer customer2) {
+        assertEquals(customer1.getId(), customer2.getId());
         assertEquals(customer1.getIdCard(), customer2.getIdCard());
         assertEquals(customer1.getName(), customer2.getName());
         assertEquals(customer1.getEmail(), customer2.getEmail());
         assertEquals(customer1.getAddress(), customer2.getAddress());
         assertEquals(customer1.getEmail(), customer2.getEmail());
-    }
-
-    private Customer copyCustomer(Customer customer) {
-        Customer customerCopy = new Customer();
-        customerCopy.setIdCard(customer.getIdCard());
-        customerCopy.setName(customer.getName());
-        customerCopy.setAddress(customer.getAddress());
-        customerCopy.setTelephone(customer.getTelephone());
-        customerCopy.setEmail(customer.getEmail());
-
-        return customerCopy;
     }
 
     private static Comparator<Customer> customerIdComparator = new Comparator<Customer>() {
