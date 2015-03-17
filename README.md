@@ -1,5 +1,6 @@
 TODO
 ====
 
-* **customerUpdate:** znovu načíst z databáze
-* roztrhat exceptions
+* **customerUpdate:** znovu  z databáze
+* test
+* abc
