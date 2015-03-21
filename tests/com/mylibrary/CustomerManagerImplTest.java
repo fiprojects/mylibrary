@@ -10,6 +10,9 @@ import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
+/**
+ * @author Michael Le <lemichael@mail.muni.cz>
+ */
 public class CustomerManagerImplTest {
     private CustomerManagerImpl customerManager;
 
