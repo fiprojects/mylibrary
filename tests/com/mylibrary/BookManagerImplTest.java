@@ -1,11 +1,15 @@
 package com.mylibrary;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import javax.activation.DataSource;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +19,7 @@ import static org.junit.Assert.*;
 
 /**
  * @author Radim Kratochvil
+ * @author Michael Le <lemichael@mail.muni.cz>
  */
 public class BookManagerImplTest {
 	private BookManagerImpl manager;
@@ -24,13 +29,33 @@ public class BookManagerImplTest {
 	public ExpectedException exception = ExpectedException.none();
 
 	@Before
-	public void setUp(){
-		manager = new BookManagerImpl(null);
+	public void setUp() throws SQLException, IOException {
+		dataSource = DataSourceFactory.getDataSource();
+		try (Connection connection = dataSource.getConnection()) {
+			connection.prepareStatement("CREATE TABLE BOOK (" +
+					"ID INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
+					"ISBN VARCHAR(50) NOT NULL," +
+					"\"NAME\" VARCHAR(50) NOT NULL," +
+					"AUTHOR VARCHAR(50) NOT NULL," +
+					"PUBLISHER VARCHAR(50) NOT NULL," +
+					"\"YEAR\" INTEGER NOT NULL," +
+					"\"LANGUAGE\" VARCHAR(50) NOT NULL," +
+					"PAGESNUMBER INTEGER NOT NULL" +
+					")").executeUpdate();
+		}
+		manager = new BookManagerImpl(dataSource);
+	}
+
+	@After
+	public void tearDown() throws SQLException {
+		try (Connection connection = dataSource.getConnection()) {
+			connection.prepareStatement("DROP TABLE BOOK").executeUpdate();
+		}
 	}
 
 	@Test
 	public void testCreateBook(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 		assertDeepEquals(book, manager.findBookById(book.getId()));
 	}
@@ -43,56 +68,56 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testCreateBookWithNullId(){
-		Book book = newBook( 1L, null, "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook(null, "Name", "Author", "Publisher", 2015, "English", 255);
 		exception.expect(IllegalArgumentException.class);
 		manager.createBook(book);
 	}
 
 	@Test
 	public void testCreateBookWithNullName(){
-		Book book = newBook( 1L, "isbn", null, "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", null, "Author", "Publisher", 2015, "English", 255);
 		exception.expect(IllegalArgumentException.class);
 		manager.createBook(book);
 	}
 
 	@Test
 	public void testCreateBookWithNullAuthor(){
-		Book book = newBook( 1L, "isbn", "Name", null, "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", null, "Publisher", 2015, "English", 255);
 		exception.expect(IllegalArgumentException.class);
 		manager.createBook(book);
 	}
 
 	@Test
 	public void testCreateBookWithNullPublisher(){
-		Book book = newBook( 1L, "isbn", "Name", "Author", null, 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", null, 2015, "English", 255);
 		exception.expect(IllegalArgumentException.class);
 		manager.createBook(book);
 	}
 
 	@Test
 	public void testCreateBookWithWrongYearOfPublication(){
-		Book book = newBook( 1L, "isbn", "Name", "Author", "Publisher", -1, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", -1, "English", 255);
 		exception.expect(IllegalArgumentException.class);
 		manager.createBook(book);
 	}
 
 	@Test
 	public void testCreateBookWithNullLanguage(){
-		Book book = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, null, 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, null, 255);
 		exception.expect(IllegalArgumentException.class);
 		manager.createBook(book);
 	}
 
 	@Test
 	public void testCreateBookWithWrongPagesNumber(){
-		Book book = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", -1);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", -1);
 		exception.expect(IllegalArgumentException.class);
 		manager.createBook(book);
 	}
 
 	@Test
 	public void testUpdateBook(){
-		Book book = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setName("Test Name");
@@ -114,7 +139,7 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testUpdateBookWithNullId(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setId(null);
@@ -124,17 +149,17 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testUpdateBookWithWrongId(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setId(book.getId() + 5);
-		exception.expect(IllegalArgumentException.class);
+		exception.expect(ServiceFailureException.class);
 		manager.updateBook(book);
 	}
 
 	@Test
 	public void testUpdateBookWithNullName(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setName(null);
@@ -144,7 +169,7 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testUpdateBookWithNullAuthor(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setAuthor(null);
@@ -154,7 +179,7 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testUpdateBookWithNullPublisher(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setPublisher(null);
@@ -164,7 +189,7 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testUpdateBookWithWrongYearOfPublication(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setYearOfPublication(-1);
@@ -174,7 +199,7 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testUpdateBookWithNullLanguage(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setLanguage(null);
@@ -184,7 +209,7 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testUpdateBookWithWrongPagesNumber(){
-		Book book = newBook(1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setPagesNumber(-1);
@@ -194,7 +219,7 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testDeleteBook(){
-		Book book = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		manager.deleteBook(book);
@@ -203,7 +228,7 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testDeleteBookWithNullBook(){
-		Book book = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		exception.expect(IllegalArgumentException.class);
@@ -212,18 +237,18 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testDeleteBookWithWrongId(){
-		Book book = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
 		manager.createBook(book);
 
 		book.setId(book.getId() + 5);
-		exception.expect(IllegalArgumentException.class);
+		exception.expect(ServiceFailureException.class);
 		manager.deleteBook(book);
 	}
 
 	@Test
 	public void testFindAllBooks(){
-		Book book1 = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
-		Book book2 = newBook( 2L, "isbn2", "Name2", "Author2", "Publisher2", 2015, "English", 255);
+		Book book1 = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book2 = newBook("isbn2", "Name2", "Author2", "Publisher2", 2015, "English", 255);
 		manager.createBook(book1);
 		manager.createBook(book2);
 
@@ -232,8 +257,8 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testFindBookById(){
-		Book book1 = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
-		Book book2 = newBook( 2L, "isbn2", "Name2", "Author2", "Publisher2", 2015, "English", 255);
+		Book book1 = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book2 = newBook("isbn2", "Name2", "Author2", "Publisher2", 2015, "English", 255);
 		manager.createBook(book1);
 		manager.createBook(book2);
 
@@ -243,9 +268,9 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testFindBookByName(){
-		Book book1 = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
-		Book book2 = newBook( 2L, "isbn2", "Name2", "Author2", "Publisher2", 2015, "English", 255);
-		Book book3 = newBook( 3L, "isbn3", "Name", "Author3", "Publisher3", 2015, "English", 255);
+		Book book1 = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book2 = newBook("isbn2", "Name2", "Author2", "Publisher2", 2015, "English", 255);
+		Book book3 = newBook("isbn3", "Name", "Author3", "Publisher3", 2015, "English", 255);
 		manager.createBook(book1);
 		manager.createBook(book2);
 		manager.createBook(book3);
@@ -256,9 +281,9 @@ public class BookManagerImplTest {
 
 	@Test
 	public void testFindBookByAuthor(){
-		Book book1 = newBook( 1L, "isbn", "Name", "Author", "Publisher", 2015, "English", 255);
-		Book book2 = newBook( 2L, "isbn2", "Name2", "Author2", "Publisher2", 2015, "English", 255);
-		Book book3 = newBook( 3L, "isbn3", "Name3", "Author", "Publisher3", 2015, "English", 255);
+		Book book1 = newBook("isbn", "Name", "Author", "Publisher", 2015, "English", 255);
+		Book book2 = newBook("isbn2", "Name2", "Author2", "Publisher2", 2015, "English", 255);
+		Book book3 = newBook("isbn3", "Name3", "Author", "Publisher3", 2015, "English", 255);
 		manager.createBook(book1);
 		manager.createBook(book2);
 		manager.createBook(book3);
@@ -267,10 +292,10 @@ public class BookManagerImplTest {
 		assertDeepEquals(Arrays.asList(book2), manager.findBookByAuthor(book2.getAuthor()));
 	}
 
-	private Book newBook(Long id, String isbn, String name, String author, String publisher,
+	private Book newBook(String isbn, String name, String author, String publisher,
 						 int yearOfPublication, String language, int pagesNumber){
 		Book book = new Book();
-		book.setId(id);
+		book.setId(null);
 		book.setIsbn(isbn);
 		book.setName(name);
 		book.setAuthor(author);

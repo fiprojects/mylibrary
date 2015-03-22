@@ -1,27 +1,50 @@
 package com.mylibrary;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
 /**
+ * @author Radim Kratochvil
  * @author Michael Le <lemichael@mail.muni.cz>
  */
 public class CustomerManagerImplTest {
     private CustomerManagerImpl customerManager;
     private DataSource dataSource;
 
-    @Before
-    public void setUp() throws Exception {
-        customerManager = new CustomerManagerImpl(null);
-    }
+	@Before
+	public void setUp() throws SQLException, IOException {
+		dataSource = DataSourceFactory.getDataSource();
+		try (Connection connection = dataSource.getConnection()) {
+			connection.prepareStatement("CREATE TABLE CUSTOMER (" +
+					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
+					"IDCARD VARCHAR(50) NOT NULL," +
+					"\"NAME\" VARCHAR(50) NOT NULL," +
+					"ADDRESS VARCHAR(50) NOT NULL," +
+					"TELEPHONE VARCHAR(50) NOT NULL," +
+					"EMAIL VARCHAR(50) NOT NULL" +
+					")").executeUpdate();
+		}
+		customerManager = new CustomerManagerImpl(dataSource);
+	}
+
+	@After
+	public void tearDown() throws SQLException {
+		try (Connection connection = dataSource.getConnection()) {
+			connection.prepareStatement("DROP TABLE CUSTOMER").executeUpdate();
+		}
+	}
 
     @Test
     public void createCustomer() throws Exception {
@@ -52,11 +75,11 @@ public class CustomerManagerImplTest {
         Long customerId = customer.getId();
 
         Customer anotherCustomer = new Customer();
-        customer.setIdCard("AX87654");
-        customer.setName("Josef Fesoj");
-        customer.setAddress("Novákova 7, 110 00 Praha");
-        customer.setTelephone("+420 111 222 333");
-        customer.setEmail("josef.fesoj@email.cz");
+		anotherCustomer.setIdCard("AX87654");
+		anotherCustomer.setName("Josef Fesoj");
+		anotherCustomer.setAddress("Novákova 7, 110 00 Praha");
+		anotherCustomer.setTelephone("+420 111 222 333");
+		anotherCustomer.setEmail("josef.fesoj@email.cz");
         customerManager.createCustomer(anotherCustomer);
         Long anotherCustomerId = anotherCustomer.getId();
 
@@ -200,19 +223,47 @@ public class CustomerManagerImplTest {
 
     @Test
     public void findCustomerByName() throws Exception {
-        Customer customer = new Customer();
-        customer.setIdCard("KA000000");
-        customer.setName("Norman Novotný");
-        customer.setAddress("Novákova 90, 110 00 Praha");
-        customer.setTelephone("+420 123 321 321");
-        customer.setEmail("normanek@email.cz");
-        customerManager.createCustomer(customer);
-        Long customerId = customer.getId();
+        List<Customer> reference = new ArrayList<>();
 
-        Customer testedCustomer = customerManager.findCustomerByName("Norman Novotný");
-        assertNotNull(testedCustomer);
-        assertEquals(customerId, testedCustomer.getId());
-        assertCustomerEquals(customer, testedCustomer);
+		Customer customer1 = new Customer();
+		customer1.setIdCard("12ABABA");
+		customer1.setName("Pavel Levak");
+		customer1.setAddress("Novákova 21, 110 00 Praha");
+		customer1.setTelephone("+420 111 111 111");
+		customer1.setEmail("left@paul.cz");
+		customerManager.createCustomer(customer1);
+
+		Customer customer2 = new Customer();
+		customer2.setIdCard("21BABAB");
+		customer2.setName("Pavel Pravak");
+		customer2.setAddress("Novákova 12, 110 00 Praha");
+		customer2.setTelephone("+420 222 222 222");
+		customer2.setEmail("right@paul.cz");
+		customerManager.createCustomer(customer2);
+
+		Customer customer3 = new Customer();
+		customer3.setIdCard("21BABAB");
+		customer3.setName("Pavel Levak");
+		customer3.setAddress("Novákova 12, 110 00 Praha");
+		customer3.setTelephone("+420 222 222 222");
+		customer3.setEmail("right@paul.cz");
+		customerManager.createCustomer(customer3);
+
+		reference.add(customer1);
+		reference.add(customer3);
+
+		List<Customer> tested = customerManager.findCustomerByName(customer1.getName());
+
+		Collections.sort(reference, customerIdComparator);
+		Collections.sort(tested, customerIdComparator);
+
+		for(int i = 0; i < reference.size(); i++) {
+			Customer c1 = reference.get(i);
+			Customer c2 = tested.get(i);
+
+			assertEquals(c1.getId(), c2.getId());
+			assertCustomerEquals(c1, c2);
+		}
     }
 
 
