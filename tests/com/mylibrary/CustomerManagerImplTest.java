@@ -3,6 +3,7 @@ package com.mylibrary;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -15,10 +16,11 @@ import static org.junit.Assert.*;
  */
 public class CustomerManagerImplTest {
     private CustomerManagerImpl customerManager;
+    private DataSource dataSource;
 
     @Before
     public void setUp() throws Exception {
-        customerManager = new CustomerManagerImpl();
+        customerManager = new CustomerManagerImpl(null);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.mylibrary;
 
+import javax.activation.DataSource;
 import java.util.List;
 
 /**
@@ -7,6 +8,10 @@ import java.util.List;
  * @author Michael Le <lemichael@mail.muni.cz>
  */
 public class BookManagerImpl implements BookManager {
+    private final DataSource dataSource;
+
+    public BookManagerImpl(DataSource dataSource) { this.dataSource = dataSource; }
+
     @Override
     public void createBook(Book book) {
         throw new UnsupportedOperationException();

@@ -5,6 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import javax.activation.DataSource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,13 +18,14 @@ import static org.junit.Assert.*;
  */
 public class BookManagerImplTest {
 	private BookManagerImpl manager;
+    private DataSource dataSource;
 
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
 	@Before
 	public void setUp(){
-		manager = new BookManagerImpl();
+		manager = new BookManagerImpl(null);
 	}
 
 	@Test
