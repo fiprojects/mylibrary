@@ -33,7 +33,7 @@ public class BookManagerImplTest {
 		dataSource = DataSourceFactory.getDataSource();
 		try (Connection connection = dataSource.getConnection()) {
 			connection.prepareStatement("CREATE TABLE BOOK (" +
-					"ID INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
+					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
 					"ISBN VARCHAR(50) NOT NULL," +
 					"\"NAME\" VARCHAR(50) NOT NULL," +
 					"AUTHOR VARCHAR(50) NOT NULL," +
