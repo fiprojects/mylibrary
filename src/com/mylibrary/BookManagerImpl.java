@@ -21,7 +21,7 @@ public class BookManagerImpl implements BookManager {
             throw new IllegalArgumentException("Book ID is already set.");
 
         try(Connection connection = dataSource.getConnection()) {
-            String query = "INSERT INTO book(isbn, \"NAME\", author, publisher, year, language, pagesNumber) "
+            String query = "INSERT INTO book(isbn, \"NAME\", author, publisher, \"YEAR\", language, pagesNumber) "
                     + " VALUES(?, ?, ?, ?, ?, ?, ?)";
             try(PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, book.getIsbn());
@@ -50,7 +50,7 @@ public class BookManagerImpl implements BookManager {
         if(book.getId() == null)
             throw new IllegalArgumentException("Book ID is not set.");
 
-        String query = "UPDATE book SET isbn = ?, \"NAME\" = ?, author = ?, publisher = ?, year = ?, language = ?,"
+        String query = "UPDATE book SET isbn = ?, \"NAME\" = ?, author = ?, publisher = ?, \"YEAR\" = ?, language = ?,"
                 + "pagesNumber = ? WHERE id = ?";
         try(Connection connection = dataSource.getConnection()) {
             try(PreparedStatement statement = connection.prepareStatement(query)) {
@@ -208,7 +208,7 @@ public class BookManagerImpl implements BookManager {
     }
 
     private String getBaseSelectString() {
-        return "SELECT id, isbn, \"NAME\", author, publisher, year, language, pagesNumber FROM book";
+        return "SELECT id, isbn, \"NAME\", author, publisher, \"YEAR\", language, pagesNumber FROM book";
     }
 
     private Long getGeneratedId(ResultSet result, Book book) throws SQLException, ServiceFailureException {
