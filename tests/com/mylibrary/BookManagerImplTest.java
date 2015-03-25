@@ -328,7 +328,7 @@ public class BookManagerImplTest {
 		}
 	}
 
-	private static Comparator<Book> idComparator = new Comparator<Book>() {
+	public static Comparator<Book> idComparator = new Comparator<Book>() {
 
 		@Override
 		public int compare(Book book1, Book book2) {
