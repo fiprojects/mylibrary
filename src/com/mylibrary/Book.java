@@ -80,4 +80,12 @@ public class Book {
     public void setPagesNumber(int pagesNumber) {
         this.pagesNumber = pagesNumber;
     }
+
+    @Override
+    public String toString() {
+        return "Book ["
+                + "id: " + getId()
+                + ", name: " + getName()
+                + "]";
+    }
 }
