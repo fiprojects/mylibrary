@@ -17,7 +17,7 @@ public class Loan {
     public Loan() {
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
