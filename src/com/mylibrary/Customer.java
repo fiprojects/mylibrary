@@ -70,4 +70,21 @@ public class Customer {
                 + ", name: " + getName()
                 + "]";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Customer)) {
+            return false;
+        }
+
+        final Customer second = (Customer)obj;
+        return (this.id == second.id || (this.id != null && this.id.equals(second.id)));
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
 }

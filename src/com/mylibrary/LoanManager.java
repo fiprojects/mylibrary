@@ -10,6 +10,7 @@ public interface LoanManager {
     void createLoan(Loan loan);
     void updateLoan(Loan loan);
     void deleteLoan(Loan loan);
+    Loan findLoanById(Long id);
     List<Book> findAllAvailableBooks();
     List<Loan> findAllLendings();
     List<Loan> findLendingsByCustomer(Customer customer);

@@ -23,6 +23,11 @@ public class LoanManagerImpl implements LoanManager {
     }
 
     @Override
+    public Loan findLoanById(Long id) {
+        return null;
+    }
+
+    @Override
     public List<Book> findAllAvailableBooks() {
         return null;
     }
