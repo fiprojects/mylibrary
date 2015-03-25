@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 
 /**
  * @author Radim Kratochvil
@@ -39,5 +40,17 @@ public class DataSourceFactory {
             return getDerbyDataSource(serverName, port, databaseName, user, password);
         else
             throw new IllegalArgumentException("Unknown database driver");
+    }
+
+    public static DataSource getDbcpDataSource() throws IOException {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("resources/dbcp.properties"));
+
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName(properties.getProperty("jdbc.driver"));
+        dataSource.setUrl(properties.getProperty("jdbc.url"));
+        dataSource.setUsername(properties.getProperty("jdbc.user"));
+        dataSource.setPassword(properties.getProperty("jdbc.password"));
+        return dataSource;
     }
 }

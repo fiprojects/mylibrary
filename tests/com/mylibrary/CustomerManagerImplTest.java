@@ -25,7 +25,7 @@ public class CustomerManagerImplTest {
 
 	@Before
 	public void setUp() throws SQLException, IOException {
-		dataSource = DataSourceFactory.getDataSource();
+		dataSource = DataSourceFactory.getDbcpDataSource();
 		try (Connection connection = dataSource.getConnection()) {
 			connection.prepareStatement("CREATE TABLE CUSTOMER (" +
 					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +

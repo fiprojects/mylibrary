@@ -7,7 +7,7 @@ import java.util.Date;
  * @author Michael Le <lemichael@mail.muni.cz>
  */
 public class Loan {
-    private int id;
+    private Long id;
     private Customer customer;
     private Book book;
     private Date startDate;
@@ -21,7 +21,7 @@ public class Loan {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
