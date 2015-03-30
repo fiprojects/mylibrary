@@ -53,4 +53,16 @@ public class DataSourceFactory {
         dataSource.setPassword(properties.getProperty("jdbc.password"));
         return dataSource;
     }
+
+	public static DataSource getDbcpMemoryDataSource() throws IOException {
+		Properties properties = new Properties();
+		properties.load(new FileInputStream("resources/dbcp.properties"));
+
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName(properties.getProperty("jdbc.driver"));
+		dataSource.setUrl(properties.getProperty("jdbc.memoryUrl"));
+		dataSource.setUsername(properties.getProperty("jdbc.user"));
+		dataSource.setPassword(properties.getProperty("jdbc.password"));
+		return dataSource;
+	}
 }

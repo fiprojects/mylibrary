@@ -12,6 +12,6 @@
     <orderEntry type="library" name="derby-10.11.1.1" level="project" />
     <orderEntry type="library" name="derbyclient-10.11.1.1" level="project" />
     <orderEntry type="library" name="junit-4.8.1" level="project" />
-    <orderEntry type="library" name="org.apache.tomcat:dbcp:6.0.14" level="project" />
+    <orderEntry type="library" name="dbcp-6.0.14" level="project" />
   </component>
 </module>
