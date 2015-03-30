@@ -4,6 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,23 +17,65 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * @author Radim Kratochvil
+ * @author Michael Le <lemichael@mail.muni.cz>
+ */
 public class LoanManagerImplTest {
     private LoanManagerImpl loanManager;
     private CustomerManagerImpl customerManager;
     private BookManagerImpl bookManager;
 
+	private DataSource dataSource;
+
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Before
     public void setUp() throws Exception {
-        loanManager = new LoanManagerImpl();
-        customerManager = new CustomerManagerImpl(null);
-        bookManager = new BookManagerImpl(null);
+		dataSource = DataSourceFactory.getDbcpMemoryDataSource();
+		try (Connection connection = dataSource.getConnection()) {
+			connection.prepareStatement("CREATE TABLE LOAN (" +
+					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
+					"IDCUSTOMER BIGINT NOT NULL," +
+					"IDBOOK BIGINT NOT NULL," +
+					"STARTDATE VARCHAR(50) NOT NULL," +
+					"ENDDATE VARCHAR(50) NOT NULL," +
+					"REALENDDATE VARCHAR(50)" +
+					")").executeUpdate();
+
+			connection.prepareStatement("CREATE TABLE BOOK (" +
+					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
+					"ISBN VARCHAR(50) NOT NULL," +
+					"\"NAME\" VARCHAR(50) NOT NULL," +
+					"AUTHOR VARCHAR(50) NOT NULL," +
+					"PUBLISHER VARCHAR(50) NOT NULL," +
+					"\"YEAR\" INTEGER NOT NULL," +
+					"\"LANGUAGE\" VARCHAR(50) NOT NULL," +
+					"PAGESNUMBER INTEGER NOT NULL" +
+					")").executeUpdate();
+
+			connection.prepareStatement("CREATE TABLE CUSTOMER (" +
+					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
+					"IDCARD VARCHAR(50) NOT NULL," +
+					"\"NAME\" VARCHAR(50) NOT NULL," +
+					"ADDRESS VARCHAR(50) NOT NULL," +
+					"TELEPHONE VARCHAR(50) NOT NULL," +
+					"EMAIL VARCHAR(50) NOT NULL" +
+					")").executeUpdate();
+		}
+
+		loanManager = new LoanManagerImpl(dataSource);
+		customerManager = new CustomerManagerImpl(dataSource);
+		bookManager = new BookManagerImpl(dataSource);
     }
 
     @After
-    public void tearDown() {
-
+    public void tearDown() throws SQLException {
+		try (Connection connection = dataSource.getConnection()) {
+			connection.prepareStatement("DROP TABLE LOAN").executeUpdate();
+			connection.prepareStatement("DROP TABLE BOOK").executeUpdate();
+			connection.prepareStatement("DROP TABLE CUSTOMER").executeUpdate();
+		}
     }
 
     @Test
