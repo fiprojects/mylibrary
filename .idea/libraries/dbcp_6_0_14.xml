@@ -1,6 +1,5 @@
 <component name="libraryTable">
-  <library name="org.apache.tomcat:dbcp:6.0.14" type="repository">
-    <properties maven-id="org.apache.tomcat:dbcp:6.0.14" />
+  <library name="dbcp-6.0.14">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/dbcp-6.0.14.jar!/" />
     </CLASSES>
