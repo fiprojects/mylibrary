@@ -1,5 +1,8 @@
 package com.mylibrary;
 
+import com.mylibrary.tools.DataSourceFactory;
+import com.mylibrary.tools.DatabaseTools;
+import org.apache.derby.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,36 +36,9 @@ public class LoanManagerImplTest {
     @Before
     public void setUp() throws Exception {
 		dataSource = DataSourceFactory.getDbcpMemoryDataSource();
-		try (Connection connection = dataSource.getConnection()) {
-			connection.prepareStatement("CREATE TABLE LOAN (" +
-					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-					"IDCUSTOMER BIGINT NOT NULL," +
-					"IDBOOK BIGINT NOT NULL," +
-					"STARTDATE VARCHAR(50) NOT NULL," +
-					"ENDDATE VARCHAR(50) NOT NULL," +
-					"REALENDDATE VARCHAR(50)" +
-					")").executeUpdate();
-
-			connection.prepareStatement("CREATE TABLE BOOK (" +
-					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-					"ISBN VARCHAR(50) NOT NULL," +
-					"\"NAME\" VARCHAR(50) NOT NULL," +
-					"AUTHOR VARCHAR(50) NOT NULL," +
-					"PUBLISHER VARCHAR(50) NOT NULL," +
-					"\"YEAR\" INTEGER NOT NULL," +
-					"\"LANGUAGE\" VARCHAR(50) NOT NULL," +
-					"PAGESNUMBER INTEGER NOT NULL" +
-					")").executeUpdate();
-
-			connection.prepareStatement("CREATE TABLE CUSTOMER (" +
-					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-					"IDCARD VARCHAR(50) NOT NULL," +
-					"\"NAME\" VARCHAR(50) NOT NULL," +
-					"ADDRESS VARCHAR(50) NOT NULL," +
-					"TELEPHONE VARCHAR(50) NOT NULL," +
-					"EMAIL VARCHAR(50) NOT NULL" +
-					")").executeUpdate();
-		}
+        DatabaseTools.executeSqlFromFile(dataSource, "createBookTable.sql");
+        DatabaseTools.executeSqlFromFile(dataSource, "createCustomerTable.sql");
+        DatabaseTools.executeSqlFromFile(dataSource, "createLoanTable.sql");
 
 		loanManager = new LoanManagerImpl(dataSource);
 		customerManager = new CustomerManagerImpl(dataSource);

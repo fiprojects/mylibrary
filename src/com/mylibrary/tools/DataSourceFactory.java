@@ -1,4 +1,4 @@
-package com.mylibrary;
+package com.mylibrary.tools;
 
 import javax.sql.DataSource;
 import java.io.FileInputStream;

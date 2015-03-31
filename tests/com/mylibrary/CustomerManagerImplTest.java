@@ -1,10 +1,13 @@
 package com.mylibrary;
 
+import com.mylibrary.tools.DataSourceFactory;
+import com.mylibrary.tools.DatabaseTools;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.sql.DataSource;
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,16 +29,7 @@ public class CustomerManagerImplTest {
 	@Before
 	public void setUp() throws SQLException, IOException {
 		dataSource = DataSourceFactory.getDbcpMemoryDataSource();
-		try (Connection connection = dataSource.getConnection()) {
-			connection.prepareStatement("CREATE TABLE CUSTOMER (" +
-					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-					"IDCARD VARCHAR(50) NOT NULL," +
-					"\"NAME\" VARCHAR(50) NOT NULL," +
-					"ADDRESS VARCHAR(50) NOT NULL," +
-					"TELEPHONE VARCHAR(50) NOT NULL," +
-					"EMAIL VARCHAR(50) NOT NULL" +
-					")").executeUpdate();
-		}
+        DatabaseTools.executeSqlFromFile(dataSource, "createCustomerTable.sql");
 		customerManager = new CustomerManagerImpl(dataSource);
 	}
 

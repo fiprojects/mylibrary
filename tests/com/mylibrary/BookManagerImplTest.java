@@ -1,5 +1,7 @@
 package com.mylibrary;
 
+import com.mylibrary.tools.DataSourceFactory;
+import com.mylibrary.tools.DatabaseTools;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,18 +33,7 @@ public class BookManagerImplTest {
 	@Before
 	public void setUp() throws SQLException, IOException {
 		dataSource = DataSourceFactory.getDbcpMemoryDataSource();
-		try (Connection connection = dataSource.getConnection()) {
-			connection.prepareStatement("CREATE TABLE BOOK (" +
-					"ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-					"ISBN VARCHAR(50) NOT NULL," +
-					"\"NAME\" VARCHAR(50) NOT NULL," +
-					"AUTHOR VARCHAR(50) NOT NULL," +
-					"PUBLISHER VARCHAR(50) NOT NULL," +
-					"\"YEAR\" INTEGER NOT NULL," +
-					"\"LANGUAGE\" VARCHAR(50) NOT NULL," +
-					"PAGESNUMBER INTEGER NOT NULL" +
-					")").executeUpdate();
-		}
+		DatabaseTools.executeSqlFromFile(dataSource, "createBookTable.sql");
 		manager = new BookManagerImpl(dataSource);
 	}
 
