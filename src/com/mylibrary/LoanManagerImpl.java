@@ -15,7 +15,7 @@ import java.util.Date;
 public class LoanManagerImpl implements LoanManager {
 	private final DataSource dataSource;
 
-	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 	public LoanManagerImpl(DataSource dataSource) {
 		this.dataSource = dataSource;

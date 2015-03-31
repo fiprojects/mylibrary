@@ -31,7 +31,7 @@ public class LoanManagerImplTest {
 
 	private DataSource dataSource;
 
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Before
     public void setUp() throws Exception {
@@ -81,8 +81,8 @@ public class LoanManagerImplTest {
         Loan loan = new Loan();
         loan.setCustomer(null);
         loan.setBook(book);
-        loan.setStartDate(getDate("2014-01-01 10:00:00"));
-        loan.setEndDate(getDate("2014-02-01 12:00:00"));
+        loan.setStartDate(getDate("2014-01-01"));
+        loan.setEndDate(getDate("2014-02-01"));
         loan.setRealEndDate(null);
         loanManager.createLoan(loan);
     }
@@ -93,8 +93,8 @@ public class LoanManagerImplTest {
 
         Loan loan = new Loan();
         loan.setCustomer(customer);
-        loan.setStartDate(getDate("2014-01-01 10:00:00"));
-        loan.setEndDate(getDate("2014-02-01 12:00:00"));
+        loan.setStartDate(getDate("2014-01-01"));
+        loan.setEndDate(getDate("2014-02-01"));
         loan.setRealEndDate(null);
         loanManager.createLoan(loan);
     }
@@ -104,8 +104,8 @@ public class LoanManagerImplTest {
         Customer customer = createCustomer();
         Book book = createBook();
 
-        String startDate = "2014-01-01 10:00:00";
-        String endDate = "2014-02-01 12:00:00";
+        String startDate = "2014-01-01";
+        String endDate = "2014-02-01";
 
         Loan loan = new Loan();
         loan.setCustomer(customer);
@@ -116,8 +116,8 @@ public class LoanManagerImplTest {
         loanManager.createLoan(loan);
         Long loanId = loan.getId();
 
-        String anotherStartDate = "2014-04-01 10:00:00";
-        String anotherEndDate = "2014-05-01 12:00:00";
+        String anotherStartDate = "2014-04-01";
+        String anotherEndDate = "2014-05-01";
 
         Loan anotherLoan = new Loan();
         anotherLoan.setCustomer(customer);
@@ -147,7 +147,7 @@ public class LoanManagerImplTest {
         assertLoanEquals(loan, testedLoan);
 
         // Start Date
-        String newStartDate = "2012-11-10 11:00:00";
+        String newStartDate = "2012-11-10";
         testedLoan = loanManager.findLoanById(loanId);
         loan.setStartDate(dateFormat.parse(newStartDate));
         testedLoan.setStartDate(dateFormat.parse(newStartDate));
@@ -156,7 +156,7 @@ public class LoanManagerImplTest {
         assertLoanEquals(loan, testedLoan);
 
         // End Date
-        String newEndDate = "2012-12-12 12:12:12";
+        String newEndDate = "2012-12-12";
         testedLoan = loanManager.findLoanById(loanId);
         loan.setEndDate(dateFormat.parse(newEndDate));
         testedLoan.setEndDate(dateFormat.parse(newEndDate));
@@ -165,7 +165,7 @@ public class LoanManagerImplTest {
         assertLoanEquals(loan, testedLoan);
 
         // Real End Date
-        String newRealEndDate = "2012-12-12 12:12:11";
+        String newRealEndDate = "2012-12-12";
         testedLoan = loanManager.findLoanById(loanId);
         loan.setRealEndDate(dateFormat.parse(newRealEndDate));
         testedLoan.setRealEndDate(dateFormat.parse(newRealEndDate));
@@ -187,8 +187,8 @@ public class LoanManagerImplTest {
         Customer customer = createCustomer();
         Book book = createBook();
 
-        String startDate = "2014-02-01 10:00:00";
-        String endDate = "2014-03-01 12:00:00";
+        String startDate = "2014-02-01";
+        String endDate = "2014-03-01";
 
         Loan loan = new Loan();
         loan.setCustomer(customer);
@@ -210,8 +210,8 @@ public class LoanManagerImplTest {
         Customer customer = createCustomer();
         Book book = createBook();
 
-        String startDate = "2014-02-01 13:00:00";
-        String endDate = "2014-03-01 14:00:00";
+        String startDate = "2014-02-01";
+        String endDate = "2014-03-01";
 
         Loan loan = new Loan();
         loan.setCustomer(customer);
@@ -233,8 +233,8 @@ public class LoanManagerImplTest {
         Customer customer = createAnotherCustomer();
         Book book = createAnotherBook();
 
-        String startDate = "2014-01-03 10:00:00";
-        String endDate = "2014-02-03 12:00:00";
+        String startDate = "2014-01-03";
+        String endDate = "2014-02-03";
 
         Loan loan = new Loan();
         loan.setCustomer(customer);
@@ -245,8 +245,8 @@ public class LoanManagerImplTest {
         loanManager.createLoan(loan);
         assertNotNull(loanManager.findLoanById(loan.getId()));
 
-        String anotherStartDate = "2014-04-01 10:00:00";
-        String anotherEndDate = "2014-05-01 12:00:00";
+        String anotherStartDate = "2014-04-01";
+        String anotherEndDate = "2014-05-01";
 
         Loan anotherLoan = new Loan();
         anotherLoan.setCustomer(customer);
@@ -272,8 +272,8 @@ public class LoanManagerImplTest {
         Customer customer = createAnotherCustomer();
         Book book = createAnotherBook();
 
-        String startDate = "2010-01-03 10:00:00";
-        String endDate = "2010-02-03 12:00:00";
+        String startDate = "2010-01-03";
+        String endDate = "2010-02-03";
 
         Loan loan = new Loan();
         loan.setCustomer(customer);
@@ -319,8 +319,8 @@ public class LoanManagerImplTest {
         Loan loan = new Loan();
         loan.setCustomer(customer);
         loan.setBook(book);
-        loan.setStartDate(getDate("2009-01-03 10:00:00"));
-        loan.setEndDate(getDate("2009-02-03 12:00:00"));
+        loan.setStartDate(getDate("2009-01-03"));
+        loan.setEndDate(getDate("2009-02-03"));
         loan.setRealEndDate(null);
         loanManager.createLoan(loan);
         reference.add(loan);
@@ -348,8 +348,8 @@ public class LoanManagerImplTest {
         Loan loan = new Loan();
         loan.setCustomer(customer);
         loan.setBook(book);
-        loan.setStartDate(getDate("2008-01-03 10:00:00"));
-        loan.setEndDate(getDate("2008-02-03 12:00:00"));
+        loan.setStartDate(getDate("2008-01-03"));
+        loan.setEndDate(getDate("2008-02-03"));
         loan.setRealEndDate(null);
         loanManager.createLoan(loan);
         reference.add(loan);
@@ -357,8 +357,8 @@ public class LoanManagerImplTest {
         Loan anotherLoan = new Loan();
         anotherLoan.setCustomer(createAnotherCustomer());
         anotherLoan.setBook(book);
-        anotherLoan.setStartDate(getDate("2008-04-03 10:00:00"));
-        anotherLoan.setEndDate(getDate("2008-08-03 12:00:00"));
+        anotherLoan.setStartDate(getDate("2008-04-03"));
+        anotherLoan.setEndDate(getDate("2008-08-03"));
         anotherLoan.setRealEndDate(null);
         loanManager.createLoan(anotherLoan);
 
