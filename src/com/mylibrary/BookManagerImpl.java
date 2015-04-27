@@ -1,5 +1,8 @@
 package com.mylibrary;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ import java.util.List;
  */
 public class BookManagerImpl implements BookManager {
     private final DataSource dataSource;
+    private final static Logger log = LoggerFactory.getLogger(BookManagerImpl.class);
 
     public BookManagerImpl(DataSource dataSource) { this.dataSource = dataSource; }
 
@@ -46,7 +50,9 @@ public class BookManagerImpl implements BookManager {
             ResultSet result = statement.getGeneratedKeys();
             book.setId(getGeneratedId(result, book));
         } catch(SQLException e) {
-            throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
         }
     }
 
@@ -80,7 +86,9 @@ public class BookManagerImpl implements BookManager {
                 throw new ServiceFailureException("Internal error! More books updated than expected: " + book);
             }
         } catch(SQLException e) {
-            throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
         }
     }
 
@@ -108,7 +116,9 @@ public class BookManagerImpl implements BookManager {
                 throw new ServiceFailureException("Internal error! More books deleted than expected: " + book);
             }
         } catch(SQLException e) {
-            throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
         }
     }
 
@@ -128,7 +138,9 @@ public class BookManagerImpl implements BookManager {
 
             return books;
         } catch(SQLException e) {
-            throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
         }
     }
 
@@ -153,7 +165,9 @@ public class BookManagerImpl implements BookManager {
 
             return null;
         } catch(SQLException e) {
-            throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
         }
     }
 
@@ -175,7 +189,9 @@ public class BookManagerImpl implements BookManager {
 
             return books;
         } catch(SQLException e) {
-            throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
         }
     }
 
@@ -197,7 +213,9 @@ public class BookManagerImpl implements BookManager {
 
             return books;
         } catch(SQLException e) {
-            throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
         }
     }
 

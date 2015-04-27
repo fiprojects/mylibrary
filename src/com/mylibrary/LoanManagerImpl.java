@@ -1,5 +1,8 @@
 package com.mylibrary;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.text.DateFormat;
@@ -14,6 +17,7 @@ import java.util.Date;
  */
 public class LoanManagerImpl implements LoanManager {
 	private final DataSource dataSource;
+	private final static Logger log = LoggerFactory.getLogger(LoanManagerImpl.class);
 
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -54,7 +58,9 @@ public class LoanManagerImpl implements LoanManager {
 			ResultSet keyRS = statement.getGeneratedKeys();
 			loan.setId(getGeneratedId(keyRS, loan));
 		} catch (SQLException ex){
-			throw new ServiceFailureException("Database connection error.", ex);
+			String msg = "Database connection error.";
+			log.error(msg, ex);
+			throw new ServiceFailureException(msg, ex);
 		}
     }
 
@@ -92,7 +98,9 @@ public class LoanManagerImpl implements LoanManager {
 				throw new ServiceFailureException("Internal error! More loans updated than expected: " + loan);
 			}
 		} catch (SQLException ex){
-			throw new ServiceFailureException("Database connection error.", ex);
+			String msg = "Database connection error.";
+			log.error(msg, ex);
+			throw new ServiceFailureException(msg, ex);
 		}
     }
 
@@ -120,7 +128,9 @@ public class LoanManagerImpl implements LoanManager {
 				throw new ServiceFailureException("Internal error! More loans deleted than expected: " + loan);
 			}
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+			String msg = "Database connection error.";
+			log.error(msg, e);
+			throw new ServiceFailureException(msg, e);
 		}
     }
 
@@ -146,7 +156,9 @@ public class LoanManagerImpl implements LoanManager {
 			}
 			return null;
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+			String msg = "Database connection error.";
+			log.error(msg, e);
+			throw new ServiceFailureException(msg, e);
 		}
 	}
 
@@ -175,7 +187,9 @@ public class LoanManagerImpl implements LoanManager {
 
 			return bookList;
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+			String msg = "Database connection error.";
+			log.error(msg, e);
+			throw new ServiceFailureException(msg, e);
 		}
     }
 
@@ -194,7 +208,9 @@ public class LoanManagerImpl implements LoanManager {
 			}
 			return loans;
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+			String msg = "Database connection error.";
+			log.error(msg, e);
+			throw new ServiceFailureException(msg, e);
 		}
     }
 
@@ -218,7 +234,9 @@ public class LoanManagerImpl implements LoanManager {
 			}
 			return loans;
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+			String msg = "Database connection error.";
+			log.error(msg, e);
+			throw new ServiceFailureException(msg, e);
 		}
     }
 

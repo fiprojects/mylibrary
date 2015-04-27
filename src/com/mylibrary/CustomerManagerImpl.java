@@ -1,5 +1,8 @@
 package com.mylibrary;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ import java.util.List;
  */
 public class CustomerManagerImpl implements CustomerManager {
 	private final DataSource dataSource;
+    private final static Logger log = LoggerFactory.getLogger(CustomerManagerImpl.class);
 
 	public CustomerManagerImpl(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -46,7 +50,9 @@ public class CustomerManagerImpl implements CustomerManager {
             ResultSet keyRS = statement.getGeneratedKeys();
             customer.setId(getGeneratedId(keyRS, customer));
 		} catch (SQLException ex){
-			throw new ServiceFailureException("Database connection error.", ex);
+            String msg = "Database connection error.";
+            log.error(msg, ex);
+            throw new ServiceFailureException(msg, ex);
 		}
     }
 
@@ -78,7 +84,9 @@ public class CustomerManagerImpl implements CustomerManager {
                 throw new ServiceFailureException("Internal error! More customers updated than expected: " + customer);
             }
 		} catch (SQLException ex){
-			throw new ServiceFailureException("Database connection error.", ex);
+            String msg = "Database connection error.";
+            log.error(msg, ex);
+            throw new ServiceFailureException(msg, ex);
 		}
     }
 
@@ -106,7 +114,9 @@ public class CustomerManagerImpl implements CustomerManager {
                 throw new ServiceFailureException("Internal error! More customers deleted than expected: " + customer);
             }
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
 		}
     }
 
@@ -125,7 +135,9 @@ public class CustomerManagerImpl implements CustomerManager {
             }
             return customers;
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
 		}
     }
 
@@ -151,7 +163,9 @@ public class CustomerManagerImpl implements CustomerManager {
             }
             return null;
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
 		}
     }
 
@@ -172,7 +186,9 @@ public class CustomerManagerImpl implements CustomerManager {
             }
             return customers;
 		} catch(SQLException e) {
-			throw new ServiceFailureException("Database connection error.", e);
+            String msg = "Database connection error.";
+            log.error(msg, e);
+            throw new ServiceFailureException(msg, e);
 		}
     }
 
