@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/sql" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/icons" type="java-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -17,5 +18,7 @@
     <orderEntry type="library" name="slf4j-log4j12-1.7.12" level="project" />
     <orderEntry type="library" name="log4j-1.2.17" level="project" />
     <orderEntry type="library" name="slf4j-api-1.7.5" level="project" />
+    <orderEntry type="library" name="forms:1.0.5" level="project" />
+    <orderEntry type="library" name="jgoodies-looks:2.5.3" level="project" />
   </component>
 </module>

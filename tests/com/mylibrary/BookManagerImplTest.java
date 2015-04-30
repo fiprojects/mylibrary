@@ -32,7 +32,7 @@ public class BookManagerImplTest {
 
 	@Before
 	public void setUp() throws SQLException, IOException {
-		dataSource = DataSourceFactory.getDbcpMemoryDataSource();
+		dataSource = DataSourceFactory.getMemoryDataSource();
 		DatabaseTools.executeSqlFromFile(dataSource, "createBookTable.sql");
 		manager = new BookManagerImpl(dataSource);
 	}

@@ -23,6 +23,6 @@ public class Sandbox {
 
     public static void i18n() {
         ResourceBundle lang = ResourceBundle.getBundle("i18n", new Locale("cs_CZ"));
-        System.out.println(lang.getString("name"));
+        System.out.println(lang.getString("surname"));
     }
 }

@@ -2,7 +2,6 @@ package com.mylibrary;
 
 import com.mylibrary.tools.DataSourceFactory;
 import com.mylibrary.tools.DatabaseTools;
-import org.apache.derby.database.Database;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +34,7 @@ public class LoanManagerImplTest {
 
     @Before
     public void setUp() throws Exception {
-		dataSource = DataSourceFactory.getDbcpMemoryDataSource();
+		dataSource = DataSourceFactory.getMemoryDataSource();
         DatabaseTools.executeSqlFromFile(dataSource, "createBookTable.sql");
         DatabaseTools.executeSqlFromFile(dataSource, "createCustomerTable.sql");
         DatabaseTools.executeSqlFromFile(dataSource, "createLoanTable.sql");

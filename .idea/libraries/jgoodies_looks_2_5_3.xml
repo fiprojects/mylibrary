@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="jgoodies-looks:2.5.3" type="repository">
+    <properties maven-id="com.jgoodies:jgoodies-looks:2.5.3" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jgoodies-looks-2.5.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jgoodies-common-1.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

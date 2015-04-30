@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -28,7 +27,7 @@ public class CustomerManagerImplTest {
 
 	@Before
 	public void setUp() throws SQLException, IOException {
-		dataSource = DataSourceFactory.getDbcpMemoryDataSource();
+		dataSource = DataSourceFactory.getMemoryDataSource();
         DatabaseTools.executeSqlFromFile(dataSource, "createCustomerTable.sql");
 		customerManager = new CustomerManagerImpl(dataSource);
 	}
