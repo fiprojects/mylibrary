@@ -26,16 +26,16 @@ import java.util.regex.Pattern;
 public class MainForm {
     private JPanel mainPanel;
     private JTabbedPane navtabs;
-    private JTable userTable;
-    private JTextField textField1;
-    private JButton findButton;
-    private JButton deleteButton;
-    private JButton newReaderButton;
-    private JTextField textField2;
-    private JTextField textField3;
-    private JTextField textField4;
-    private JTextField textField5;
-    private JTextField textField6;
+    private JTable readerTable;
+    private JTextField readerNameFilter;
+    private JButton findReader;
+    private JButton deleteReader;
+    private JButton newReader;
+    private JTextField readerName;
+    private JTextField readerCard;
+    private JTextField readerAddress;
+    private JTextField readerPhone;
+    private JTextField readerEmail;
     private JButton saveButton;
     private JTable bookTable;
     private JTextField bookAuthorFilter;
@@ -53,6 +53,8 @@ public class MainForm {
     private JPanel newBookTab;
     private JButton deleteBook;
     private JButton saveBook;
+    private JTabbedPane readersControl;
+    private JButton checkOutButton;
 
     private BookManager bookManager;
     private Long bookEditId = null;
