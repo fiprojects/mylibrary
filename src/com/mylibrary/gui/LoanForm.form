@@ -27,6 +27,10 @@
         <colspec value="left:4dlu:noGrow"/>
         <colspec value="fill:max(d;4px):noGrow"/>
         <colspec value="left:14dlu:noGrow"/>
+        <colspec value="fill:max(d;4px):noGrow"/>
+        <colspec value="left:4dlu:noGrow"/>
+        <colspec value="fill:max(m;4px):noGrow"/>
+        <colspec value="left:4dlu:noGrow"/>
         <colspec value="fill:164px:grow"/>
         <colspec value="left:4dlu:noGrow"/>
         <colspec value="fill:max(d;4px):noGrow"/>
@@ -51,38 +55,49 @@
               <font name="Tahoma" size="18"/>
               <foreground color="-16777216"/>
               <icon value="book2.png"/>
-              <text value="Výpůjčky"/>
+              <text resource-bundle="i18n" key="loans"/>
             </properties>
           </component>
           <component id="4ff7e" class="javax.swing.JButton" default-binding="true">
             <constraints>
-              <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
               <forms defaultalign-horz="false"/>
             </constraints>
             <properties>
               <icon value="stock_exit.png"/>
-              <text value="Opustit"/>
+              <text resource-bundle="i18n" key="exit"/>
             </properties>
           </component>
           <component id="3fc49" class="javax.swing.JLabel">
             <constraints>
-              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <font size="14" style="1"/>
+              <foreground color="-16777216"/>
+              <text value="Novák Jan"/>
+            </properties>
+          </component>
+          <component id="21213" class="javax.swing.JButton" default-binding="true">
+            <constraints>
+              <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-horz="false"/>
+            </constraints>
+            <properties>
+              <icon value="undo.png"/>
+              <text resource-bundle="i18n" key="returnBook"/>
+            </properties>
+          </component>
+          <component id="955e9" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <forms/>
             </constraints>
             <properties>
               <font size="14"/>
               <foreground color="-16777216"/>
-              <text value="Čtenář: Novák Jan"/>
-            </properties>
-          </component>
-          <component id="21213" class="javax.swing.JButton" default-binding="true">
-            <constraints>
-              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-              <forms defaultalign-horz="false"/>
-            </constraints>
-            <properties>
-              <icon value="undo.png"/>
-              <text value="Vrátit knihu"/>
+              <text resource-bundle="i18n" key="reader"/>
             </properties>
           </component>
         </children>
@@ -95,7 +110,7 @@
         <properties>
           <font size="14"/>
         </properties>
-        <border type="none" title="Výpůjčky čtenáře"/>
+        <border type="none" title-resource-bundle="i18n" title-key="loansOfReader"/>
         <children>
           <component id="e99b7" class="javax.swing.JTable" binding="table1" default-binding="true">
             <constraints/>
@@ -109,7 +124,7 @@
           <forms defaultalign-horz="false" defaultalign-vert="false"/>
         </constraints>
         <properties/>
-        <border type="none" title="Dostupné knihy"/>
+        <border type="none" title-resource-bundle="i18n" title-key="availBooks"/>
         <children>
           <component id="c6bc8" class="javax.swing.JTable" binding="table2" default-binding="true">
             <constraints/>
@@ -145,7 +160,7 @@
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <constraints>
-              <tabbedpane title="Filtr"/>
+              <tabbedpane title-resource-bundle="i18n" title-key="filter"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -156,7 +171,7 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Název"/>
+                  <text resource-bundle="i18n" key="nameObject"/>
                 </properties>
               </component>
               <component id="e8e83" class="javax.swing.JTextField" default-binding="true">
@@ -178,8 +193,8 @@
                 <properties>
                   <icon value="toolbar_find.png"/>
                   <iconTextGap value="2"/>
-                  <label value="Hledat"/>
-                  <text value="Hledat"/>
+                  <label value="Find"/>
+                  <text resource-bundle="i18n" key="find"/>
                 </properties>
               </component>
               <component id="548df" class="javax.swing.JLabel">
@@ -188,7 +203,7 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Autor"/>
+                  <text resource-bundle="i18n" key="author"/>
                 </properties>
               </component>
               <component id="70186" class="javax.swing.JTextField" binding="textField7" default-binding="true">
@@ -208,7 +223,7 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="% - libovolná hodnota"/>
+                  <text resource-bundle="i18n" key="anyValue"/>
                 </properties>
               </component>
             </children>
@@ -241,7 +256,7 @@
               <font name="Tahoma" size="18"/>
               <foreground color="-16777216"/>
               <icon value="add.png"/>
-              <text value="Nová výpůjčka"/>
+              <text resource-bundle="i18n" key="newLoan"/>
             </properties>
           </component>
           <component id="a95dd" class="javax.swing.JButton" default-binding="true">
@@ -251,7 +266,7 @@
             </constraints>
             <properties>
               <icon value="check.png"/>
-              <text value="Půjčit knihu"/>
+              <text resource-bundle="i18n" key="borrowBook"/>
             </properties>
           </component>
         </children>

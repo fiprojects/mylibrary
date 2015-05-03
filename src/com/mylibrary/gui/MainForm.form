@@ -26,7 +26,7 @@
             <rowspec value="fill:m:noGrow"/>
             <colspec value="fill:d:grow"/>
             <constraints>
-              <tabbedpane title="Čtenáři"/>
+              <tabbedpane title-resource-bundle="i18n" title-key="readers"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -57,7 +57,7 @@
                     <colspec value="left:4dlu:noGrow"/>
                     <colspec value="fill:max(d;4px):noGrow"/>
                     <constraints>
-                      <tabbedpane title="Filtr"/>
+                      <tabbedpane title-resource-bundle="i18n" title-key="filter"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
@@ -68,7 +68,7 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Jméno"/>
+                          <text resource-bundle="i18n" key="name"/>
                         </properties>
                       </component>
                       <component id="58523" class="javax.swing.JTextField" binding="textField1" default-binding="true">
@@ -82,15 +82,15 @@
                           <text value="%"/>
                         </properties>
                       </component>
-                      <component id="7d9f8" class="javax.swing.JButton" binding="button1" default-binding="true">
+                      <component id="7d9f8" class="javax.swing.JButton" binding="findButton" default-binding="true">
                         <constraints>
                           <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                           <forms defaultalign-horz="false"/>
                         </constraints>
                         <properties>
                           <icon value="toolbar_find.png"/>
-                          <label value="Hledat"/>
-                          <text value="Hledat"/>
+                          <label value="Find"/>
+                          <text resource-bundle="i18n" key="find"/>
                         </properties>
                       </component>
                       <component id="4906" class="javax.swing.JLabel">
@@ -99,7 +99,7 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="% - libovolná hodnota"/>
+                          <text resource-bundle="i18n" key="anyValue"/>
                         </properties>
                       </component>
                     </children>
@@ -128,7 +128,7 @@
                     <colspec value="left:4dlu:noGrow"/>
                     <colspec value="fill:max(d;4px):noGrow"/>
                     <constraints>
-                      <tabbedpane title="Editace"/>
+                      <tabbedpane title-resource-bundle="i18n" title-key="edit"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
@@ -139,7 +139,7 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Jméno"/>
+                          <text resource-bundle="i18n" key="name"/>
                         </properties>
                       </component>
                       <component id="bbfda" class="javax.swing.JTextField" binding="textField2" default-binding="true">
@@ -149,7 +149,9 @@
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="nameObject"/>
+                        </properties>
                       </component>
                       <component id="df730" class="javax.swing.JLabel">
                         <constraints>
@@ -157,7 +159,7 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Číslo OP"/>
+                          <text resource-bundle="i18n" key="idCard"/>
                         </properties>
                       </component>
                       <component id="2ab96" class="javax.swing.JTextField" binding="textField3" default-binding="true">
@@ -167,7 +169,9 @@
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="idCard"/>
+                        </properties>
                       </component>
                       <component id="4e7d6" class="javax.swing.JLabel">
                         <constraints>
@@ -175,7 +179,7 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Adresa"/>
+                          <text resource-bundle="i18n" key="address"/>
                         </properties>
                       </component>
                       <component id="39f77" class="javax.swing.JTextField" binding="textField4" default-binding="true">
@@ -185,7 +189,9 @@
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="address"/>
+                        </properties>
                       </component>
                       <component id="f9706" class="javax.swing.JLabel">
                         <constraints>
@@ -194,7 +200,7 @@
                         </constraints>
                         <properties>
                           <name value=""/>
-                          <text value="Telefon"/>
+                          <text resource-bundle="i18n" key="telephone"/>
                         </properties>
                       </component>
                       <component id="c0e68" class="javax.swing.JTextField" binding="textField5" default-binding="true">
@@ -204,7 +210,9 @@
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="telephone"/>
+                        </properties>
                       </component>
                       <component id="77b8a" class="javax.swing.JLabel">
                         <constraints>
@@ -213,7 +221,7 @@
                         </constraints>
                         <properties>
                           <name value=""/>
-                          <text value="E-mail"/>
+                          <text resource-bundle="i18n" key="email"/>
                         </properties>
                       </component>
                       <component id="dc56c" class="javax.swing.JTextField" binding="textField6" default-binding="true">
@@ -223,18 +231,20 @@
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="email"/>
+                        </properties>
                       </component>
-                      <component id="4467a" class="javax.swing.JButton" binding="button2" default-binding="true">
+                      <component id="4467a" class="javax.swing.JButton" binding="saveButton" default-binding="true">
                         <constraints>
                           <grid row="8" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                           <forms defaultalign-horz="false"/>
                         </constraints>
                         <properties>
                           <icon value="save.png"/>
-                          <label value="Uložit"/>
+                          <label value="Save"/>
                           <selected value="false"/>
-                          <text value="Uložit"/>
+                          <text resource-bundle="i18n" key="save"/>
                           <verifyInputWhenFocusTarget value="false"/>
                         </properties>
                       </component>
@@ -274,27 +284,27 @@
                       <font name="Tahoma" size="18"/>
                       <foreground color="-16777216"/>
                       <icon value="people.png"/>
-                      <text value="Čtenáři"/>
+                      <text resource-bundle="i18n" key="readers"/>
                     </properties>
                   </component>
-                  <component id="58272" class="javax.swing.JButton" binding="smazatButton" default-binding="true">
+                  <component id="58272" class="javax.swing.JButton" binding="deleteButton" default-binding="true">
                     <constraints>
                       <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                       <forms defaultalign-horz="false"/>
                     </constraints>
                     <properties>
                       <icon value="delete.png"/>
-                      <text value="Smazat"/>
+                      <text resource-bundle="i18n" key="delete"/>
                     </properties>
                   </component>
-                  <component id="38ea8" class="javax.swing.JButton" binding="novýČtenářButton" default-binding="true">
+                  <component id="38ea8" class="javax.swing.JButton" binding="newReaderButton" default-binding="true">
                     <constraints>
                       <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                       <forms/>
                     </constraints>
                     <properties>
                       <icon value="add1.png"/>
-                      <text value="Nový čtenář"/>
+                      <text resource-bundle="i18n" key="newReader"/>
                     </properties>
                   </component>
                   <component id="75d8d" class="javax.swing.JButton" default-binding="true">
@@ -303,10 +313,10 @@
                       <forms defaultalign-horz="false"/>
                     </constraints>
                     <properties>
-                      <actionCommand value="Půjčovna →"/>
+                      <actionCommand value=""/>
                       <icon value="check.png"/>
-                      <label value="Půjčovna →"/>
-                      <text value="Půjčovna →"/>
+                      <label value="Check Out →"/>
+                      <text resource-bundle="i18n" key="checkOut"/>
                     </properties>
                   </component>
                 </children>
@@ -342,7 +352,7 @@
             <rowspec value="center:max(m;4px):noGrow"/>
             <colspec value="fill:d:grow"/>
             <constraints>
-              <tabbedpane title="Knihy"/>
+              <tabbedpane title-resource-bundle="i18n" title-key="books"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -377,20 +387,21 @@
                       <font name="Tahoma" size="18"/>
                       <foreground color="-16777216"/>
                       <icon value="book2.png"/>
-                      <text value="Kniha"/>
+                      <text resource-bundle="i18n" key="books"/>
                     </properties>
                   </component>
-                  <component id="ea3fe" class="javax.swing.JButton" default-binding="true">
+                  <component id="ea3fe" class="javax.swing.JButton" binding="deleteBook">
                     <constraints>
                       <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                       <forms defaultalign-horz="false"/>
                     </constraints>
                     <properties>
+                      <enabled value="false"/>
                       <icon value="delete.png"/>
-                      <text value="Smazat"/>
+                      <text resource-bundle="i18n" key="delete"/>
                     </properties>
                   </component>
-                  <component id="5b619" class="javax.swing.JButton" default-binding="true">
+                  <component id="5b619" class="javax.swing.JButton" binding="newBook">
                     <constraints>
                       <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                       <forms/>
@@ -403,12 +414,12 @@
                       <horizontalTextPosition value="11"/>
                       <icon value="add1.png"/>
                       <iconTextGap value="4"/>
-                      <text value="Nová kniha"/>
+                      <text resource-bundle="i18n" key="newBook"/>
                     </properties>
                   </component>
                 </children>
               </grid>
-              <tabbedpane id="a2666">
+              <tabbedpane id="a2666" binding="booksControl">
                 <constraints>
                   <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                     <preferred-size width="200" height="200"/>
@@ -436,7 +447,7 @@
                     <colspec value="left:4dlu:noGrow"/>
                     <colspec value="fill:max(d;4px):noGrow"/>
                     <constraints>
-                      <tabbedpane title="Filtr"/>
+                      <tabbedpane title-resource-bundle="i18n" title-key="filter"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
@@ -447,10 +458,10 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Název"/>
+                          <text resource-bundle="i18n" key="name"/>
                         </properties>
                       </component>
-                      <component id="43473" class="javax.swing.JTextField" default-binding="true">
+                      <component id="43473" class="javax.swing.JTextField" binding="bookNameFilter">
                         <constraints>
                           <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
@@ -461,15 +472,16 @@
                           <text value="%"/>
                         </properties>
                       </component>
-                      <component id="2ca3a" class="javax.swing.JButton" default-binding="true">
+                      <component id="2ca3a" class="javax.swing.JButton" binding="findBook">
                         <constraints>
                           <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                           <forms defaultalign-horz="false"/>
                         </constraints>
                         <properties>
                           <icon value="toolbar_find.png"/>
-                          <label value="Hledat"/>
-                          <text value="Hledat"/>
+                          <label value="Find"/>
+                          <selected value="false"/>
+                          <text resource-bundle="i18n" key="find"/>
                         </properties>
                       </component>
                       <component id="ba1b0" class="javax.swing.JLabel">
@@ -478,10 +490,10 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Autor"/>
+                          <text resource-bundle="i18n" key="author"/>
                         </properties>
                       </component>
-                      <component id="7da1c" class="javax.swing.JTextField" binding="textField7" default-binding="true">
+                      <component id="7da1c" class="javax.swing.JTextField" binding="bookAuthorFilter">
                         <constraints>
                           <grid row="4" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
@@ -498,12 +510,12 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="% - libovolná hodnota"/>
+                          <text resource-bundle="i18n" key="anyValue"/>
                         </properties>
                       </component>
                     </children>
                   </grid>
-                  <grid id="f069e" layout-manager="FormLayout">
+                  <grid id="f069e" binding="newBookTab" layout-manager="FormLayout">
                     <rowspec value="center:max(d;4px):noGrow"/>
                     <rowspec value="top:4dlu:noGrow"/>
                     <rowspec value="center:d:noGrow"/>
@@ -531,7 +543,7 @@
                     <colspec value="left:4dlu:noGrow"/>
                     <colspec value="fill:max(d;4px):noGrow"/>
                     <constraints>
-                      <tabbedpane title="Editace"/>
+                      <tabbedpane title-resource-bundle="i18n" title-key="newBook"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
@@ -542,17 +554,20 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Název"/>
+                          <labelFor value="fb130"/>
+                          <text resource-bundle="i18n" key="nameObject"/>
                         </properties>
                       </component>
-                      <component id="fb130" class="javax.swing.JTextField" default-binding="true">
+                      <component id="fb130" class="javax.swing.JTextField" binding="bookName">
                         <constraints>
                           <grid row="2" column="4" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="nameObject"/>
+                        </properties>
                       </component>
                       <component id="bd42a" class="javax.swing.JLabel">
                         <constraints>
@@ -560,17 +575,20 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Autor"/>
+                          <labelFor value="60e91"/>
+                          <text resource-bundle="i18n" key="author"/>
                         </properties>
                       </component>
-                      <component id="60e91" class="javax.swing.JTextField" default-binding="true">
+                      <component id="60e91" class="javax.swing.JTextField" binding="bookAuthor">
                         <constraints>
                           <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="author"/>
+                        </properties>
                       </component>
                       <component id="4d727" class="javax.swing.JLabel">
                         <constraints>
@@ -578,18 +596,21 @@
                           <forms/>
                         </constraints>
                         <properties>
+                          <labelFor value="7895c"/>
                           <name value=""/>
-                          <text value="Nakladatelství"/>
+                          <text resource-bundle="i18n" key="publisher"/>
                         </properties>
                       </component>
-                      <component id="7895c" class="javax.swing.JTextField" default-binding="true">
+                      <component id="7895c" class="javax.swing.JTextField" binding="bookPublisher">
                         <constraints>
                           <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="publisher"/>
+                        </properties>
                       </component>
                       <component id="55369" class="javax.swing.JLabel">
                         <constraints>
@@ -597,18 +618,21 @@
                           <forms/>
                         </constraints>
                         <properties>
+                          <labelFor value="2dd8a"/>
                           <name value=""/>
-                          <text value="Rok vydání"/>
+                          <text resource-bundle="i18n" key="yearOfPublication"/>
                         </properties>
                       </component>
-                      <component id="2dd8a" class="javax.swing.JTextField" default-binding="true">
+                      <component id="2dd8a" class="javax.swing.JTextField" binding="bookYearOfPublication">
                         <constraints>
                           <grid row="6" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="yearOfPublication"/>
+                        </properties>
                       </component>
                       <component id="a868d" class="javax.swing.JLabel">
                         <constraints>
@@ -616,17 +640,21 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="ISBN"/>
+                          <labelFor value="11bc7"/>
+                          <text resource-bundle="i18n" key="isbn"/>
                         </properties>
                       </component>
-                      <component id="11bc7" class="javax.swing.JTextField" default-binding="true">
+                      <component id="11bc7" class="javax.swing.JTextField" binding="bookIsbn">
                         <constraints>
                           <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="isbn"/>
+                          <text value=""/>
+                        </properties>
                       </component>
                       <component id="7b8ff" class="javax.swing.JLabel">
                         <constraints>
@@ -634,19 +662,22 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Jazyk"/>
+                          <labelFor value="37153"/>
+                          <text resource-bundle="i18n" key="language"/>
                         </properties>
                       </component>
-                      <component id="37153" class="javax.swing.JTextField" binding="textField8" default-binding="true">
+                      <component id="37153" class="javax.swing.JTextField" binding="bookLanguage">
                         <constraints>
                           <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="language"/>
+                        </properties>
                       </component>
-                      <component id="9fd23" class="javax.swing.JButton" default-binding="true">
+                      <component id="9fd23" class="javax.swing.JButton" binding="saveBook">
                         <constraints>
                           <grid row="10" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                           <forms defaultalign-horz="false"/>
@@ -659,14 +690,16 @@
                           <verifyInputWhenFocusTarget value="false"/>
                         </properties>
                       </component>
-                      <component id="5a554" class="javax.swing.JTextField" binding="textField9" default-binding="true">
+                      <component id="5a554" class="javax.swing.JTextField" binding="bookPagesNumber">
                         <constraints>
                           <grid row="8" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                           <forms defaultalign-horz="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <name resource-bundle="i18n" key="numberOfPages"/>
+                        </properties>
                       </component>
                       <component id="af012" class="javax.swing.JLabel">
                         <constraints>
@@ -674,7 +707,8 @@
                           <forms/>
                         </constraints>
                         <properties>
-                          <text value="Počet stránek"/>
+                          <labelFor value="5a554"/>
+                          <text resource-bundle="i18n" key="numberOfPages"/>
                         </properties>
                       </component>
                     </children>
@@ -691,7 +725,7 @@
                 </properties>
                 <border type="none"/>
                 <children>
-                  <component id="66f86" class="javax.swing.JTable" binding="bookTable">
+                  <component id="66f86" class="javax.swing.JTable" binding="bookTable" custom-create="true">
                     <constraints/>
                     <properties>
                       <font size="14"/>
