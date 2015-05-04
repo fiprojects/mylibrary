@@ -1,10 +1,19 @@
 package com.mylibrary.gui;
 
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
+
 import com.mylibrary.Book;
 import com.mylibrary.BookManager;
 import com.mylibrary.BookManagerImpl;
+import com.mylibrary.Customer;
+import com.mylibrary.CustomerManager;
+import com.mylibrary.CustomerManagerImpl;
+
+import com.mylibrary.gui.LoanForm;
+
 import com.mylibrary.models.BookTableModel;
+import com.mylibrary.models.CustomerTableModel;
+
 import com.mylibrary.tools.DataSourceFactory;
 import com.mylibrary.tools.Localization;
 import com.mylibrary.tools.Validator;
@@ -36,7 +45,7 @@ public class MainForm {
     private JTextField readerAddress;
     private JTextField readerPhone;
     private JTextField readerEmail;
-    private JButton saveButton;
+    private JButton saveReader;
     private JTable bookTable;
     private JTextField bookAuthorFilter;
     private JTextField bookLanguage;
@@ -57,12 +66,17 @@ public class MainForm {
     private JButton checkOutButton;
 
     private BookManager bookManager;
+	private CustomerManager customerManager;
     private Long bookEditId = null;
+	private Long customerEditId = null;
+
     private TableRowSorter<BookTableModel> bookTableSorter;
+	private TableRowSorter<CustomerTableModel> readerTableSorter;
 
     public MainForm() {
         try {
             bookManager = new BookManagerImpl(DataSourceFactory.getDataSource());
+			customerManager = new CustomerManagerImpl(DataSourceFactory.getDataSource());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,6 +115,7 @@ public class MainForm {
         newBook.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+				bookTable.clearSelection();
                 cleanBookEdit();
                 booksControl.setSelectedIndex(1);
             }
@@ -110,7 +125,7 @@ public class MainForm {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (bookTable.getSelectedRow() > -1) {
-                    final Long id = selectedItemId();
+                    final Long id = selectedItemId(bookTable);
                     if (id == null) return;
 
                     new SwingWorker<Void, Void>() {
@@ -135,7 +150,7 @@ public class MainForm {
         deleteBook.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                final Long id = selectedItemId();
+                final Long id = selectedItemId(bookTable);
                 if (id == null) return;
 
                 int answer = JOptionPane.showConfirmDialog(
@@ -158,6 +173,7 @@ public class MainForm {
 
                     protected void done() {
                         ((BookTableModel) bookTable.getModel()).loadData();
+						cleanBookEdit();
                     }
                 }.execute();
             }
@@ -202,6 +218,158 @@ public class MainForm {
                 }.execute();
             }
         });
+
+		readerTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (readerTable.getSelectedRow() > -1) {
+					final Long id = selectedItemId(readerTable);
+					if (id == null) return;
+
+					new SwingWorker<Void, Void>() {
+						@Override
+						protected Void doInBackground() {
+							fillReaderEdit(id);
+							return null;
+						}
+
+						protected void done() {
+							readersControl.setSelectedIndex(1);
+						}
+					}.execute();
+
+					deleteReader.setEnabled(true);
+				} else {
+					deleteReader.setEnabled(false);
+				}
+			}
+		});
+
+		newReader.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				readerTable.clearSelection();
+				cleanReaderEdit();
+				readersControl.setSelectedIndex(1);
+			}
+		});
+
+		deleteReader.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				final Long id = selectedItemId(readerTable);
+				if (id == null) return;
+
+				int answer = JOptionPane.showConfirmDialog(
+						mainPanel,
+						Localization.get("confirmDelete"),
+						"My Library",
+						JOptionPane.YES_NO_OPTION);
+				if (answer != 0) return;
+
+				deleteReader.setEnabled(false);
+				new SwingWorker<Void, Void>() {
+					@Override
+					protected Void doInBackground() {
+						Customer customer = customerManager.findCustomerById(id);
+						if (customer == null) return null;
+
+						customerManager.deleteCustomer(customer);
+						return null;
+					}
+
+					protected void done() {
+						((CustomerTableModel) readerTable.getModel()).loadData();
+						cleanReaderEdit();
+					}
+				}.execute();
+			}
+		});
+
+		saveReader.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!validateReader()) return;
+				if(customerEditId != null && customerManager.findCustomerById(customerEditId) == null) return;
+
+				saveReader.setEnabled(false);
+				new SwingWorker<Void, Void>() {
+					@Override
+					protected Void doInBackground() {
+						Customer customer;
+						if(customerEditId != null) customer = customerManager.findCustomerById(customerEditId);
+						else customer = new Customer();
+
+						customer.setIdCard(readerCard.getText());
+						customer.setName(readerName.getText());
+						customer.setAddress(readerAddress.getText());
+						customer.setTelephone(readerPhone.getText());
+						customer.setEmail(readerEmail.getText());
+
+						if(customerEditId != null) customerManager.updateCustomer(customer);
+						else customerManager.createCustomer(customer);
+
+						return null;
+					}
+
+					protected void done() {
+						((CustomerTableModel) readerTable.getModel()).loadData();
+						cleanReaderEdit();
+						saveReader.setEnabled(true);
+					}
+				}.execute();
+			}
+		});
+
+		findReader.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				findReader.setEnabled(false);
+
+				new SwingWorker<Void, Void>() {
+					@Override
+					protected Void doInBackground() {
+						String nameFilter = readerNameFilter.getText();
+						if (nameFilter.equals("%")) nameFilter = "";
+
+						ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
+						filters.add(RowFilter.regexFilter(Pattern.quote(nameFilter), 1));
+
+						RowFilter<CustomerTableModel, Object> filter = RowFilter.andFilter(filters);
+						readerTableSorter.setRowFilter(filter);
+
+						return null;
+					}
+
+					protected void done() {
+						findReader.setEnabled(true);
+					}
+				}.execute();
+			}
+		});
+
+		checkOutButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					UIManager.setLookAndFeel(new WindowsLookAndFeel());
+				} catch (UnsupportedLookAndFeelException e1) {
+					e1.printStackTrace();
+				}
+
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						LoanForm loanForm = new LoanForm();
+						try {
+							loanForm.start();
+						} catch (UnsupportedLookAndFeelException e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+			}
+		});
     }
 
     public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException, IOException {
@@ -222,6 +390,7 @@ public class MainForm {
 
     private void createUIComponents() throws IOException {
         createBookTable();
+		createReaderTable();
     }
 
     private void createBookTable() throws IOException {
@@ -240,13 +409,13 @@ public class MainForm {
         bookTable.setRowSorter(bookTableSorter);
     }
 
-    private Long selectedItemId() {
-        int rowIndex = bookTable.getSelectedRow();
+    private Long selectedItemId(JTable tbl) {
+        int rowIndex = tbl.getSelectedRow();
         if(rowIndex < 0) {
             return null;
         }
 
-        return (Long) bookTable.getValueAt(rowIndex, 0);
+        return (Long) tbl.getValueAt(rowIndex, 0);
     }
 
     private void cleanBookEdit() {
@@ -293,4 +462,61 @@ public class MainForm {
 
         return validator.getConclusion();
     }
+
+	private void createReaderTable() throws IOException {
+		CustomerTableModel model = new CustomerTableModel();
+
+		readerTable = new JTable();
+		readerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		readerTable.setModel(model);
+
+		readerTable.getColumnModel().getColumn(0).setPreferredWidth(20);
+		readerTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+		readerTable.getColumnModel().getColumn(2).setPreferredWidth(100);
+		readerTable.getColumnModel().getColumn(3).setPreferredWidth(100);
+		readerTable.getColumnModel().getColumn(4).setPreferredWidth(90);
+		readerTable.getColumnModel().getColumn(5).setPreferredWidth(90);
+
+		readerTableSorter = new TableRowSorter<>(model);
+		readerTable.setRowSorter(readerTableSorter);
+	}
+
+	private void cleanReaderEdit() {
+		customerEditId = null;
+
+		readerName.setText("");
+		readerCard.setText("");
+		readerAddress.setText("");
+		readerPhone.setText("");
+		readerEmail.setText("");
+
+		readersControl.setTitleAt(1, Localization.get("newReader"));
+	}
+
+	private void fillReaderEdit(Long id) {
+		Customer customer = customerManager.findCustomerById(id);
+		if(customer == null) return;
+
+		customerEditId = id;
+
+		readerName.setText(customer.getName());
+		readerCard.setText(customer.getIdCard());
+		readerAddress.setText(customer.getAddress());
+		readerPhone.setText(customer.getTelephone());
+		readerEmail.setText(customer.getEmail());
+
+		readersControl.setTitleAt(1, Localization.get("edit"));
+	}
+
+	private boolean validateReader() {
+		Validator validator = new Validator(mainPanel);
+
+		validator.mandatory(readerName);
+		validator.mandatory(readerCard);
+		validator.mandatory(readerAddress);
+		validator.mandatory(readerPhone);
+		validator.mandatory(readerEmail);
+
+		return validator.getConclusion();
+	}
 }
