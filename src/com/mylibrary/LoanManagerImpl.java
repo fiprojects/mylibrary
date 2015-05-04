@@ -170,9 +170,8 @@ public class LoanManagerImpl implements LoanManager {
 		try(
 				Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-						"SELECT IDBOOK FROM LOAN WHERE REALENDDATE = ?")
+						"SELECT IDBOOK FROM LOAN WHERE REALENDDATE IS NULL")
 		) {
-			statement.setString(1, null);
 
 			ResultSet result = statement.executeQuery();
 			Set<Long> unavailableBooks = new TreeSet<>();
