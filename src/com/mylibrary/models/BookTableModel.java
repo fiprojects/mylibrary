@@ -77,7 +77,7 @@ public class BookTableModel extends AbstractTableModel {
         new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
-                books = manager.findAllBooks();
+				setBooks(manager.findAllBooks());
                 return null;
             }
 
@@ -86,4 +86,8 @@ public class BookTableModel extends AbstractTableModel {
             }
         }.execute();
     }
+
+	public void setBooks(List<Book> books){
+		this.books = books;
+	}
 }
