@@ -20,8 +20,8 @@ public class CustomerTableModel extends AbstractTableModel {
 	private CustomerManager manager;
 	private List<Customer> customers = new ArrayList<>();
 
-	public CustomerTableModel() throws IOException {
-		manager = new CustomerManagerImpl(DataSourceFactory.getDataSource());
+	public CustomerTableModel(CustomerManager customerManager) {
+		this.manager = customerManager;
 		loadData();
 	}
 

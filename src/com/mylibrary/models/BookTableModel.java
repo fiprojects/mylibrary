@@ -20,8 +20,8 @@ public class BookTableModel extends AbstractTableModel {
     private BookManager manager;
     private List<Book> books = new ArrayList<>();
 
-    public BookTableModel() throws IOException {
-        manager = new BookManagerImpl(DataSourceFactory.getDataSource());
+    public BookTableModel(BookManager bookManager) {
+        this.manager = bookManager;
         loadData();
     }
 

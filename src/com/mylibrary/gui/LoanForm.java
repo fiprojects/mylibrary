@@ -55,7 +55,20 @@ public class LoanForm {
 	private Long bookID = null;
 
 	public LoanForm(){
+		EventQueue.invokeLater(() -> {
+			JFrame frame = new JFrame("My Library");
+			frame.setContentPane(defaultPanel);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			frame.pack();
+			frame.setVisible(true);
+		});
+
+
+
 		customerID = (long) 2;
+
+
+
 
 		findBook.addMouseListener(new MouseAdapter() {
 			@Override
@@ -166,7 +179,7 @@ public class LoanForm {
 		borrowBook.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(bookID != null && bookManager.findBookById(bookID) == null) return;
+				if (bookID != null && bookManager.findBookById(bookID) == null) return;
 
 				borrowBook.setEnabled(false);
 				new SwingWorker<Void, Void>() {
@@ -209,26 +222,6 @@ public class LoanForm {
 						borrowBook.setEnabled(true);
 					}
 				}.execute();
-			}
-		});
-	}
-
-    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
-		start();
-    }
-
-	public static void start() throws UnsupportedLookAndFeelException {
-		UIManager.setLookAndFeel(new WindowsLookAndFeel());
-
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				LoanForm loanForm = new LoanForm();
-				JFrame frame = new JFrame("My Library - Loans");
-				frame.setContentPane(loanForm.defaultPanel);
-				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				frame.pack();
-				frame.setVisible(true);
 			}
 		});
 	}

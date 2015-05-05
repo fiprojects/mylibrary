@@ -1,15 +1,6 @@
 package com.mylibrary.gui;
 
-import com.jgoodies.looks.windows.WindowsLookAndFeel;
-
-import com.mylibrary.Book;
-import com.mylibrary.BookManager;
-import com.mylibrary.BookManagerImpl;
-import com.mylibrary.Customer;
-import com.mylibrary.CustomerManager;
-import com.mylibrary.CustomerManagerImpl;
-
-import com.mylibrary.gui.LoanForm;
+import com.mylibrary.*;
 
 import com.mylibrary.models.BookTableModel;
 import com.mylibrary.models.CustomerTableModel;
@@ -17,13 +8,13 @@ import com.mylibrary.models.CustomerTableModel;
 import com.mylibrary.tools.DataSourceFactory;
 import com.mylibrary.tools.Localization;
 import com.mylibrary.tools.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -33,370 +24,109 @@ import java.util.regex.Pattern;
  * @author Michael Le <lemichael@mail.muni.cz>
  */
 public class MainForm {
+    private final static Logger log = LoggerFactory.getLogger(MainForm.class);
+    private final BookManager bookManager;
+    private final CustomerManager customerManager;
+    private final LoanManager loanManager;
+
+    private Long bookEditId = null;
+    private Long customerEditId = null;
+
+    private TableRowSorter<BookTableModel> bookTableSorter;
+    private TableRowSorter<CustomerTableModel> readerTableSorter;
+
     private JPanel mainPanel;
-    private JTabbedPane navtabs;
     private JTable readerTable;
     private JTextField readerNameFilter;
-    private JButton findReader;
-    private JButton deleteReader;
-    private JButton newReader;
+    private JButton findReaderButton;
+    private JButton deleteReaderButton;
+    private JButton newReaderButton;
     private JTextField readerName;
     private JTextField readerCard;
     private JTextField readerAddress;
     private JTextField readerPhone;
     private JTextField readerEmail;
-    private JButton saveReader;
+    private JButton saveReaderButton;
     private JTable bookTable;
     private JTextField bookAuthorFilter;
     private JTextField bookLanguage;
     private JTextField bookPagesNumber;
-    private JButton findBook;
+    private JButton findBookButton;
     private JTextField bookNameFilter;
-    private JButton newBook;
+    private JButton newBookButton;
     private JTabbedPane booksControl;
     private JTextField bookName;
     private JTextField bookAuthor;
     private JTextField bookIsbn;
     private JTextField bookPublisher;
     private JTextField bookYearOfPublication;
-    private JPanel newBookTab;
-    private JButton deleteBook;
-    private JButton saveBook;
+    private JButton deleteBookButton;
+    private JButton saveBookButton;
     private JTabbedPane readersControl;
     private JButton checkOutButton;
 
-    private BookManager bookManager;
-	private CustomerManager customerManager;
-    private Long bookEditId = null;
-	private Long customerEditId = null;
 
-    private TableRowSorter<BookTableModel> bookTableSorter;
-	private TableRowSorter<CustomerTableModel> readerTableSorter;
+    public MainForm(BookManager bookManager, CustomerManager customerManager, LoanManager loanManager) throws IOException {
+        this.bookManager = bookManager;
+        this.customerManager = customerManager;
+        this.loanManager = loanManager;
 
-    public MainForm() {
+        addBookListeners(); // Book tab listeners
+        addReaderListeners(); // Reader tab listeners
+		checkOutButton.addActionListener(e -> new LoanForm());
+
+        initializeBookTable();
+        initializeReaderTable();
+    }
+
+    public static void main(String[] args) {
+        final BookManager bookManager;
+        final CustomerManager customerManager;
+        final LoanManager loanManager;
+
         try {
-            bookManager = new BookManagerImpl(DataSourceFactory.getDataSource());
-			customerManager = new CustomerManagerImpl(DataSourceFactory.getDataSource());
+            DataSource dataSource = DataSourceFactory.getDataSource();
+            bookManager = new BookManagerImpl(dataSource);
+            customerManager = new CustomerManagerImpl(dataSource);
+            loanManager = new LoanManagerImpl(dataSource);
         } catch (IOException e) {
-            e.printStackTrace();
+            String message = "Error when connecting to database.";
+            System.out.println(message);
+            log.error(message + e);
+
+            return;
         }
 
-        findBook.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                findBook.setEnabled(false);
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            String message = "Error when setting user interface.";
+            System.out.println(message);
+            log.error(message + e);
 
-                new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() {
-                        String nameFilter = bookNameFilter.getText();
-                        if (nameFilter.equals("%")) nameFilter = "";
+            return;
+        }
 
-                        String authorFilter = bookAuthorFilter.getText();
-                        if (authorFilter.equals("%")) authorFilter = "";
-
-                        ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
-                        filters.add(RowFilter.regexFilter(Pattern.quote(nameFilter), 1));
-                        filters.add(RowFilter.regexFilter(Pattern.quote(authorFilter), 2));
-
-                        RowFilter<BookTableModel, Object> filter = RowFilter.andFilter(filters);
-                        bookTableSorter.setRowFilter(filter);
-
-                        return null;
-                    }
-
-                    protected void done() {
-                        findBook.setEnabled(true);
-                    }
-                }.execute();
+        EventQueue.invokeLater(() -> {
+            MainForm mainForm = null;
+            try {
+                mainForm = new MainForm(bookManager, customerManager, loanManager);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
-
-        newBook.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-				bookTable.clearSelection();
-                cleanBookEdit();
-                booksControl.setSelectedIndex(1);
-            }
-        });
-
-        bookTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (bookTable.getSelectedRow() > -1) {
-                    final Long id = selectedItemId(bookTable);
-                    if (id == null) return;
-
-                    new SwingWorker<Void, Void>() {
-                        @Override
-                        protected Void doInBackground() {
-                            fillBookEdit(id);
-                            return null;
-                        }
-
-                        protected void done() {
-                            booksControl.setSelectedIndex(1);
-                        }
-                    }.execute();
-
-                    deleteBook.setEnabled(true);
-                } else {
-                    deleteBook.setEnabled(false);
-                }
-            }
-        });
-
-        deleteBook.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                final Long id = selectedItemId(bookTable);
-                if (id == null) return;
-
-                int answer = JOptionPane.showConfirmDialog(
-                        mainPanel,
-                        Localization.get("confirmDelete"),
-                        "My Library",
-                        JOptionPane.YES_NO_OPTION);
-                if (answer != 0) return;
-
-                deleteBook.setEnabled(false);
-                new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() {
-                        Book book = bookManager.findBookById(id);
-                        if (book == null) return null;
-
-                        bookManager.deleteBook(book);
-                        return null;
-                    }
-
-                    protected void done() {
-                        ((BookTableModel) bookTable.getModel()).loadData();
-						cleanBookEdit();
-                    }
-                }.execute();
-            }
-        });
-
-        saveBook.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if(!validateBook()) return;
-                if(bookEditId != null && bookManager.findBookById(bookEditId) == null) return;
-
-                saveBook.setEnabled(false);
-                new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() {
-                        int yearOfPublication = Integer.parseInt(bookYearOfPublication.getText());
-                        int pagesNumber = Integer.parseInt(bookPagesNumber.getText());
-
-                        Book book;
-                        if(bookEditId != null) book = bookManager.findBookById(bookEditId);
-                        else book = new Book();
-
-                        book.setName(bookName.getText());
-                        book.setAuthor(bookAuthor.getText());
-                        book.setIsbn(bookIsbn.getText());
-                        book.setPublisher(bookPublisher.getText());
-                        book.setYearOfPublication(yearOfPublication);
-                        book.setLanguage(bookLanguage.getText());
-                        book.setPagesNumber(pagesNumber);
-
-                        if(bookEditId != null) bookManager.updateBook(book);
-                        else bookManager.createBook(book);
-
-                        return null;
-                    }
-
-                    protected void done() {
-                        ((BookTableModel) bookTable.getModel()).loadData();
-                        cleanBookEdit();
-                        saveBook.setEnabled(true);
-                    }
-                }.execute();
-            }
-        });
-
-		readerTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (readerTable.getSelectedRow() > -1) {
-					final Long id = selectedItemId(readerTable);
-					if (id == null) return;
-
-					new SwingWorker<Void, Void>() {
-						@Override
-						protected Void doInBackground() {
-							fillReaderEdit(id);
-							return null;
-						}
-
-						protected void done() {
-							readersControl.setSelectedIndex(1);
-						}
-					}.execute();
-
-					deleteReader.setEnabled(true);
-				} else {
-					deleteReader.setEnabled(false);
-				}
-			}
-		});
-
-		newReader.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				readerTable.clearSelection();
-				cleanReaderEdit();
-				readersControl.setSelectedIndex(1);
-			}
-		});
-
-		deleteReader.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				final Long id = selectedItemId(readerTable);
-				if (id == null) return;
-
-				int answer = JOptionPane.showConfirmDialog(
-						mainPanel,
-						Localization.get("confirmDelete"),
-						"My Library",
-						JOptionPane.YES_NO_OPTION);
-				if (answer != 0) return;
-
-				deleteReader.setEnabled(false);
-				new SwingWorker<Void, Void>() {
-					@Override
-					protected Void doInBackground() {
-						Customer customer = customerManager.findCustomerById(id);
-						if (customer == null) return null;
-
-						customerManager.deleteCustomer(customer);
-						return null;
-					}
-
-					protected void done() {
-						((CustomerTableModel) readerTable.getModel()).loadData();
-						cleanReaderEdit();
-					}
-				}.execute();
-			}
-		});
-
-		saveReader.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(!validateReader()) return;
-				if(customerEditId != null && customerManager.findCustomerById(customerEditId) == null) return;
-
-				saveReader.setEnabled(false);
-				new SwingWorker<Void, Void>() {
-					@Override
-					protected Void doInBackground() {
-						Customer customer;
-						if(customerEditId != null) customer = customerManager.findCustomerById(customerEditId);
-						else customer = new Customer();
-
-						customer.setIdCard(readerCard.getText());
-						customer.setName(readerName.getText());
-						customer.setAddress(readerAddress.getText());
-						customer.setTelephone(readerPhone.getText());
-						customer.setEmail(readerEmail.getText());
-
-						if(customerEditId != null) customerManager.updateCustomer(customer);
-						else customerManager.createCustomer(customer);
-
-						return null;
-					}
-
-					protected void done() {
-						((CustomerTableModel) readerTable.getModel()).loadData();
-						cleanReaderEdit();
-						saveReader.setEnabled(true);
-					}
-				}.execute();
-			}
-		});
-
-		findReader.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				findReader.setEnabled(false);
-
-				new SwingWorker<Void, Void>() {
-					@Override
-					protected Void doInBackground() {
-						String nameFilter = readerNameFilter.getText();
-						if (nameFilter.equals("%")) nameFilter = "";
-
-						ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
-						filters.add(RowFilter.regexFilter(Pattern.quote(nameFilter), 1));
-
-						RowFilter<CustomerTableModel, Object> filter = RowFilter.andFilter(filters);
-						readerTableSorter.setRowFilter(filter);
-
-						return null;
-					}
-
-					protected void done() {
-						findReader.setEnabled(true);
-					}
-				}.execute();
-			}
-		});
-
-		checkOutButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				try {
-					UIManager.setLookAndFeel(new WindowsLookAndFeel());
-				} catch (UnsupportedLookAndFeelException e1) {
-					e1.printStackTrace();
-				}
-
-				EventQueue.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						LoanForm loanForm = new LoanForm();
-						try {
-							loanForm.start();
-						} catch (UnsupportedLookAndFeelException e1) {
-							e1.printStackTrace();
-						}
-					}
-				});
-			}
-		});
-    }
-
-    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException, IOException {
-        UIManager.setLookAndFeel(new WindowsLookAndFeel());
-
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MainForm mainForm = new MainForm();
-                JFrame frame = new JFrame("My Library - Katalog");
-                frame.setContentPane(mainForm.mainPanel);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.pack();
-                frame.setVisible(true);
-            }
+            JFrame frame = new JFrame("My Library");
+            frame.setContentPane(mainForm.mainPanel);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.pack();
+            frame.setVisible(true);
         });
     }
 
-    private void createUIComponents() throws IOException {
-        createBookTable();
-		createReaderTable();
-    }
 
-    private void createBookTable() throws IOException {
-        BookTableModel model = new BookTableModel();
+    // Initialize tables
+    private void initializeBookTable() {
+        BookTableModel model = new BookTableModel(bookManager);
 
-        bookTable = new JTable();
         bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         bookTable.setModel(model);
 
@@ -409,45 +139,391 @@ public class MainForm {
         bookTable.setRowSorter(bookTableSorter);
     }
 
-    private Long selectedItemId(JTable tbl) {
+    private void initializeReaderTable() {
+        CustomerTableModel model = new CustomerTableModel(customerManager);
+
+        readerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        readerTable.setModel(model);
+
+        readerTable.getColumnModel().getColumn(0).setPreferredWidth(20);
+        readerTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+        readerTable.getColumnModel().getColumn(2).setPreferredWidth(100);
+        readerTable.getColumnModel().getColumn(3).setPreferredWidth(100);
+        readerTable.getColumnModel().getColumn(4).setPreferredWidth(90);
+        readerTable.getColumnModel().getColumn(5).setPreferredWidth(90);
+
+        readerTableSorter = new TableRowSorter<>(model);
+        readerTable.setRowSorter(readerTableSorter);
+    }
+
+
+    // Listeners
+    private void addBookListeners() {
+        // New book
+        newBookButton.addActionListener(e -> {
+            bookTable.clearSelection();
+            clearBookDetailsForm();
+            booksControl.setSelectedIndex(1); // Switch to details tab
+        });
+
+        // Delete book
+        deleteBookButton.addActionListener(e -> {
+            final Long id = getSelectedItemId(bookTable);
+            if (id == null) return;
+            if (!confirmDeletion()) return;
+
+            deleteBookButton.setEnabled(false);
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    Book book = bookManager.findBookById(id);
+                    if (book == null) return null;
+
+                    bookManager.deleteBook(book);
+                    log.info("Book deleted: " + book);
+
+                    return null;
+                }
+
+                protected void done() {
+                    getBookTableModel().loadData();
+                    clearBookDetailsForm();
+                }
+            }.execute();
+        });
+
+        // Find book
+        findBookButton.addActionListener(e -> {
+            findBookButton.setEnabled(false);
+
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    String nameFilter = getFilterValue(bookNameFilter);
+                    String authorFilter = getFilterValue(bookAuthorFilter);
+
+                    ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
+                    filters.add(RowFilter.regexFilter(nameFilter, 1));
+                    filters.add(RowFilter.regexFilter(authorFilter, 2));
+
+                    RowFilter<BookTableModel, Object> filter = RowFilter.andFilter(filters);
+                    bookTableSorter.setRowFilter(filter);
+
+                    return null;
+                }
+
+                protected void done() {
+                    findBookButton.setEnabled(true);
+                }
+            }.execute();
+        });
+
+        // Save book
+        saveBookButton.addActionListener(e -> {
+            if (!validateBook()) return;
+
+            saveBookButton.setEnabled(false);
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    Book book;
+                    if (bookEditId != null) {
+                        book = bookManager.findBookById(bookEditId);
+                        if (book == null) return null;
+                    } else {
+                        book = new Book();
+                    }
+
+                    setBookDataFromForm(book);
+
+                    if (bookEditId != null) {
+                        bookManager.updateBook(book);
+                        log.info("Book updated: " + book);
+                    } else {
+                        bookManager.createBook(book);
+                        log.info("Book added: " + book);
+                    }
+
+                    return null;
+                }
+
+                protected void done() {
+                    getBookTableModel().loadData();
+                    clearBookDetailsForm();
+                    saveBookButton.setEnabled(true);
+                }
+            }.execute();
+        });
+
+        // Table selection
+        bookTable.getSelectionModel().addListSelectionListener(e -> {
+            if (bookTable.getSelectedRow() < 0) {
+                deleteBookButton.setEnabled(false);
+                return;
+            }
+
+            final Long id = getSelectedItemId(bookTable);
+            updateBookDetailsForm(id);
+        });
+    }
+
+    private void addReaderListeners() {
+        // New reader
+        newReaderButton.addActionListener(e -> {
+            readerTable.clearSelection();
+            clearReaderDetailsForm();
+            readersControl.setSelectedIndex(1); // Switch to details tab
+        });
+
+        // Delete reader
+        deleteReaderButton.addActionListener(e -> {
+            final Long id = getSelectedItemId(readerTable);
+            if (id == null) return;
+            if (!confirmDeletion()) return;
+
+            deleteReaderButton.setEnabled(false);
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    Customer customer = customerManager.findCustomerById(id);
+                    if (customer == null) return null;
+
+                    customerManager.deleteCustomer(customer);
+                    log.info("Customer deleted: " + customer);
+
+                    return null;
+                }
+
+                protected void done() {
+                    getCustomerTableModel().loadData();
+                    clearReaderDetailsForm();
+                }
+            }.execute();
+        });
+
+        // Find reader
+        findReaderButton.addActionListener(e -> {
+            findReaderButton.setEnabled(false);
+
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    String nameFilter = getFilterValue(readerNameFilter);
+
+                    ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
+                    filters.add(RowFilter.regexFilter(nameFilter, 1));
+
+                    RowFilter<CustomerTableModel, Object> filter = RowFilter.andFilter(filters);
+                    readerTableSorter.setRowFilter(filter);
+
+                    return null;
+                }
+
+                protected void done() {
+                    findReaderButton.setEnabled(true);
+                }
+            }.execute();
+        });
+
+        // Save reader
+        saveReaderButton.addActionListener(e -> {
+            if (!validateReader()) return;
+
+            saveReaderButton.setEnabled(false);
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    Customer customer;
+                    if (customerEditId != null) {
+                        customer = customerManager.findCustomerById(customerEditId);
+                        if (customer == null) return null;
+                    } else {
+                        customer = new Customer();
+                    }
+
+                    setCustomerDataFromForm(customer);
+
+                    if (customerEditId != null) {
+                        customerManager.updateCustomer(customer);
+                        log.info("Customer updated: " + customer);
+                    } else {
+                        customerManager.createCustomer(customer);
+                        log.info("Customer added: " + customer);
+                    }
+
+                    return null;
+                }
+
+                protected void done() {
+                    getCustomerTableModel().loadData();
+                    clearReaderDetailsForm();
+                    saveReaderButton.setEnabled(true);
+                }
+            }.execute();
+        });
+
+        // Table selection
+        readerTable.getSelectionModel().addListSelectionListener(e -> {
+            if (readerTable.getSelectedRow() < 0) {
+                deleteReaderButton.setEnabled(false);
+                return;
+            }
+
+            final Long id = getSelectedItemId(readerTable);
+            updateReaderDetailsForm(id);
+        });
+    }
+
+
+    // Common
+    private boolean confirmDeletion() {
+        int answer = JOptionPane.showConfirmDialog(
+                mainPanel,
+                Localization.get("confirmDelete"),
+                "My Library",
+                JOptionPane.YES_NO_OPTION);
+
+        return answer == 0;
+    }
+
+    private void errorDialog(String localizationKey) {
+        JOptionPane.showMessageDialog(
+                mainPanel,
+                Localization.get(localizationKey),
+                "My Library",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    private String getFilterValue(JTextField filterField) {
+        String filterValue = filterField.getText();
+
+        if(filterValue.equals("%")) return "";
+        return Pattern.quote(filterValue);
+    }
+
+    private Long getSelectedItemId(JTable tbl) {
         int rowIndex = tbl.getSelectedRow();
-        if(rowIndex < 0) {
-            return null;
-        }
+        if (rowIndex < 0) return null;
 
         return (Long) tbl.getValueAt(rowIndex, 0);
     }
 
-    private void cleanBookEdit() {
+
+    // Retrieve data from form
+    private void setBookDataFromForm(Book book) {
+        int yearOfPublication = Integer.parseInt(bookYearOfPublication.getText());
+        int pagesNumber = Integer.parseInt(bookPagesNumber.getText());
+
+        book.setName(bookName.getText());
+        book.setAuthor(bookAuthor.getText());
+        book.setIsbn(bookIsbn.getText());
+        book.setPublisher(bookPublisher.getText());
+        book.setYearOfPublication(yearOfPublication);
+        book.setLanguage(bookLanguage.getText());
+        book.setPagesNumber(pagesNumber);
+    }
+
+    private void setCustomerDataFromForm(Customer customer) {
+        customer.setIdCard(readerCard.getText());
+        customer.setName(readerName.getText());
+        customer.setAddress(readerAddress.getText());
+        customer.setTelephone(readerPhone.getText());
+        customer.setEmail(readerEmail.getText());
+    }
+
+
+    // Update edit forms
+    private void updateBookDetailsForm(Long id) {
+        if (id == null) return;
+        new SwingWorker<Book, Void>() {
+            @Override
+            protected Book doInBackground() {
+                return bookManager.findBookById(id);
+            }
+
+            protected void done() {
+                Book book = null;
+                try {
+                    book = get();
+                } catch (Exception e) {
+                    errorDialog("bookLoadError");
+                    log.error("Retrieving book failed." + e);
+                    return;
+                }
+
+                bookEditId = id;
+                bookName.setText(book.getName());
+                bookAuthor.setText(book.getAuthor());
+                bookIsbn.setText(book.getIsbn());
+                bookPublisher.setText(book.getPublisher());
+                bookYearOfPublication.setText(String.valueOf(book.getYearOfPublication()));
+                bookLanguage.setText(book.getLanguage());
+                bookPagesNumber.setText(String.valueOf(book.getPagesNumber()));
+
+                booksControl.setTitleAt(1, Localization.get("edit"));
+                booksControl.setSelectedIndex(1); // Switch to details tab
+                deleteBookButton.setEnabled(true);
+            }
+        }.execute();
+    }
+
+    private void updateReaderDetailsForm(Long id) {
+        if (id == null) return;
+        new SwingWorker<Customer, Void>() {
+            @Override
+            protected Customer doInBackground() {
+                return customerManager.findCustomerById(id);
+            }
+
+            protected void done() {
+                Customer customer = null;
+                try {
+                    customer = get();
+                } catch (Exception e) {
+                    errorDialog("customerLoadError");
+                    log.error("Retrieving customer failed." + e);
+                    return;
+                }
+
+                customerEditId = id;
+                readerName.setText(customer.getName());
+                readerCard.setText(customer.getIdCard());
+                readerAddress.setText(customer.getAddress());
+                readerPhone.setText(customer.getTelephone());
+                readerEmail.setText(customer.getEmail());
+
+                readersControl.setTitleAt(1, Localization.get("edit"));
+                readersControl.setSelectedIndex(1); // Switch to details tab
+                deleteReaderButton.setEnabled(true);
+            }
+        }.execute();
+    }
+
+
+    // Clear edit forms
+    private void clearBookDetailsForm() {
         bookEditId = null;
-
-        bookName.setText("");
-        bookAuthor.setText("");
-        bookIsbn.setText("");
-        bookPublisher.setText("");
-        bookYearOfPublication.setText("");
-        bookLanguage.setText("");
-        bookPagesNumber.setText("");
-
+        clearFields(bookName, bookAuthor, bookIsbn,
+                bookPublisher, bookYearOfPublication, bookLanguage,
+                bookPagesNumber);
         booksControl.setTitleAt(1, Localization.get("newBook"));
     }
 
-    private void fillBookEdit(Long id) {
-        Book book = bookManager.findBookById(id);
-        if(book == null) return;
+	private void clearReaderDetailsForm() {
+		customerEditId = null;
+        clearFields(readerName, readerCard, readerAddress,
+                readerPhone, readerEmail);
+		readersControl.setTitleAt(1, Localization.get("newReader"));
+	}
 
-        bookEditId = id;
-        bookName.setText(book.getName());
-        bookAuthor.setText(book.getAuthor());
-        bookIsbn.setText(book.getIsbn());
-        bookPublisher.setText(book.getPublisher());
-        bookYearOfPublication.setText(String.valueOf(book.getYearOfPublication()));
-        bookLanguage.setText(book.getLanguage());
-        bookPagesNumber.setText(String.valueOf(book.getPagesNumber()));
-
-        booksControl.setTitleAt(1, Localization.get("edit"));
+    private void clearFields(JTextField... fields) {
+        for (JTextField field : fields) {
+            field.setText("");
+        }
     }
 
+
+    // Validation
     private boolean validateBook() {
         Validator validator = new Validator(mainPanel);
 
@@ -463,51 +539,6 @@ public class MainForm {
         return validator.getConclusion();
     }
 
-	private void createReaderTable() throws IOException {
-		CustomerTableModel model = new CustomerTableModel();
-
-		readerTable = new JTable();
-		readerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		readerTable.setModel(model);
-
-		readerTable.getColumnModel().getColumn(0).setPreferredWidth(20);
-		readerTable.getColumnModel().getColumn(1).setPreferredWidth(100);
-		readerTable.getColumnModel().getColumn(2).setPreferredWidth(100);
-		readerTable.getColumnModel().getColumn(3).setPreferredWidth(100);
-		readerTable.getColumnModel().getColumn(4).setPreferredWidth(90);
-		readerTable.getColumnModel().getColumn(5).setPreferredWidth(90);
-
-		readerTableSorter = new TableRowSorter<>(model);
-		readerTable.setRowSorter(readerTableSorter);
-	}
-
-	private void cleanReaderEdit() {
-		customerEditId = null;
-
-		readerName.setText("");
-		readerCard.setText("");
-		readerAddress.setText("");
-		readerPhone.setText("");
-		readerEmail.setText("");
-
-		readersControl.setTitleAt(1, Localization.get("newReader"));
-	}
-
-	private void fillReaderEdit(Long id) {
-		Customer customer = customerManager.findCustomerById(id);
-		if(customer == null) return;
-
-		customerEditId = id;
-
-		readerName.setText(customer.getName());
-		readerCard.setText(customer.getIdCard());
-		readerAddress.setText(customer.getAddress());
-		readerPhone.setText(customer.getTelephone());
-		readerEmail.setText(customer.getEmail());
-
-		readersControl.setTitleAt(1, Localization.get("edit"));
-	}
-
 	private boolean validateReader() {
 		Validator validator = new Validator(mainPanel);
 
@@ -519,4 +550,14 @@ public class MainForm {
 
 		return validator.getConclusion();
 	}
+
+
+    // Get table models
+    private BookTableModel getBookTableModel() {
+        return (BookTableModel) bookTable.getModel();
+    }
+
+    private CustomerTableModel getCustomerTableModel() {
+        return (CustomerTableModel) readerTable.getModel();
+    }
 }
