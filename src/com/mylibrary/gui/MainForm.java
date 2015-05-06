@@ -17,12 +17,14 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 /**
  * @author Radim Kratochvil
  * @author Michael Le <lemichael@mail.muni.cz>
  */
+// TODO: Ověřit ošetření výjimek vyhazovaných databází
+// TODO: Proklikat, zda vše funguje po refaktoringu
+// TODO: Lokalizace data podle nastavení OS?
 public class MainForm {
     private final static Logger log = LoggerFactory.getLogger(MainForm.class);
     private final BookManager bookManager;
@@ -66,14 +68,14 @@ public class MainForm {
     private JButton checkOutButton;
 
 
-    public MainForm(BookManager bookManager, CustomerManager customerManager, LoanManager loanManager) throws IOException {
+    public MainForm(BookManager bookManager, CustomerManager customerManager, LoanManager loanManager) {
         this.bookManager = bookManager;
         this.customerManager = customerManager;
         this.loanManager = loanManager;
 
         addBookListeners(); // Book tab listeners
         addReaderListeners(); // Reader tab listeners
-		checkOutButton.addActionListener(e -> new LoanForm());
+        checkOutButton.addActionListener(e -> checkOut());
 
         initializeBookTable();
         initializeReaderTable();
@@ -108,15 +110,10 @@ public class MainForm {
         }
 
         EventQueue.invokeLater(() -> {
-            MainForm mainForm = null;
-            try {
-                mainForm = new MainForm(bookManager, customerManager, loanManager);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            MainForm mainForm = new MainForm(bookManager, customerManager, loanManager);
             JFrame frame = new JFrame("My Library");
             frame.setContentPane(mainForm.mainPanel);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.pack();
             frame.setVisible(true);
         });
@@ -168,7 +165,7 @@ public class MainForm {
 
         // Delete book
         deleteBookButton.addActionListener(e -> {
-            final Long id = getSelectedItemId(bookTable);
+            final Long id = UICommon.getSelectedItemId(bookTable);
             if (id == null) return;
             if (!confirmDeletion()) return;
 
@@ -193,29 +190,17 @@ public class MainForm {
         });
 
         // Find book
+        // TODO: Není potřeba SwingWorker?
         findBookButton.addActionListener(e -> {
-            findBookButton.setEnabled(false);
+            String nameFilter = UICommon.getFilterValue(bookNameFilter);
+            String authorFilter = UICommon.getFilterValue(bookAuthorFilter);
 
-            new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() {
-                    String nameFilter = getFilterValue(bookNameFilter);
-                    String authorFilter = getFilterValue(bookAuthorFilter);
+            ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
+            filters.add(RowFilter.regexFilter(nameFilter, 1));
+            filters.add(RowFilter.regexFilter(authorFilter, 2));
 
-                    ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
-                    filters.add(RowFilter.regexFilter(nameFilter, 1));
-                    filters.add(RowFilter.regexFilter(authorFilter, 2));
-
-                    RowFilter<BookTableModel, Object> filter = RowFilter.andFilter(filters);
-                    bookTableSorter.setRowFilter(filter);
-
-                    return null;
-                }
-
-                protected void done() {
-                    findBookButton.setEnabled(true);
-                }
-            }.execute();
+            RowFilter<BookTableModel, Object> filter = RowFilter.andFilter(filters);
+            bookTableSorter.setRowFilter(filter);
         });
 
         // Save book
@@ -262,7 +247,7 @@ public class MainForm {
                 return;
             }
 
-            final Long id = getSelectedItemId(bookTable);
+            final Long id = UICommon.getSelectedItemId(bookTable);
             updateBookDetailsForm(id);
         });
     }
@@ -277,7 +262,7 @@ public class MainForm {
 
         // Delete reader
         deleteReaderButton.addActionListener(e -> {
-            final Long id = getSelectedItemId(readerTable);
+            final Long id = UICommon.getSelectedItemId(readerTable);
             if (id == null) return;
             if (!confirmDeletion()) return;
 
@@ -302,27 +287,15 @@ public class MainForm {
         });
 
         // Find reader
+        // TODO: Není potřeba SwingWorker?
         findReaderButton.addActionListener(e -> {
-            findReaderButton.setEnabled(false);
+            String nameFilter = UICommon.getFilterValue(readerNameFilter);
 
-            new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() {
-                    String nameFilter = getFilterValue(readerNameFilter);
+            ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
+            filters.add(RowFilter.regexFilter(nameFilter, 1));
 
-                    ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
-                    filters.add(RowFilter.regexFilter(nameFilter, 1));
-
-                    RowFilter<CustomerTableModel, Object> filter = RowFilter.andFilter(filters);
-                    readerTableSorter.setRowFilter(filter);
-
-                    return null;
-                }
-
-                protected void done() {
-                    findReaderButton.setEnabled(true);
-                }
-            }.execute();
+            RowFilter<CustomerTableModel, Object> filter = RowFilter.andFilter(filters);
+            readerTableSorter.setRowFilter(filter);
         });
 
         // Save reader
@@ -369,9 +342,43 @@ public class MainForm {
                 return;
             }
 
-            final Long id = getSelectedItemId(readerTable);
+            final Long id = UICommon.getSelectedItemId(readerTable);
             updateReaderDetailsForm(id);
         });
+    }
+
+    private void checkOut() {
+        Long customerId = UICommon.getSelectedItemId(readerTable);
+        if (customerId == null) {
+            errorDialog("readerNotSelected");
+            return;
+        }
+
+        new SwingWorker<Customer, Void>() {
+            @Override
+            protected Customer doInBackground() {
+                return customerManager.findCustomerById(customerEditId);
+            }
+
+            protected void done() {
+                Customer customer;
+                try {
+                    customer = get();
+                } catch(Exception e) {
+                    errorDialog("customerLoadError");
+                    log.error("Customer cannot be loaded when checking out." + e);
+                    return;
+                }
+
+                if (customer == null) {
+                    errorDialog("customerLoadError");
+                    log.error("Customer cannot be loaded when checking out.");
+                    return;
+                }
+
+                new LoanForm(bookManager, loanManager, customer);
+            }
+        }.execute();
     }
 
 
@@ -392,20 +399,6 @@ public class MainForm {
                 Localization.get(localizationKey),
                 "My Library",
                 JOptionPane.ERROR_MESSAGE);
-    }
-
-    private String getFilterValue(JTextField filterField) {
-        String filterValue = filterField.getText();
-
-        if(filterValue.equals("%")) return "";
-        return Pattern.quote(filterValue);
-    }
-
-    private Long getSelectedItemId(JTable tbl) {
-        int rowIndex = tbl.getSelectedRow();
-        if (rowIndex < 0) return null;
-
-        return (Long) tbl.getValueAt(rowIndex, 0);
     }
 
 
@@ -442,7 +435,7 @@ public class MainForm {
             }
 
             protected void done() {
-                Book book = null;
+                Book book;
                 try {
                     book = get();
                 } catch (Exception e) {
@@ -476,7 +469,7 @@ public class MainForm {
             }
 
             protected void done() {
-                Customer customer = null;
+                Customer customer;
                 try {
                     customer = get();
                 } catch (Exception e) {

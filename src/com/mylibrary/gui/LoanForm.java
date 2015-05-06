@@ -1,35 +1,41 @@
 package com.mylibrary.gui;
 
-import com.jgoodies.looks.windows.WindowsLookAndFeel;
-
 import com.mylibrary.*;
 
+import com.mylibrary.models.AvailableBooksTableModel;
 import com.mylibrary.models.BookTableModel;
 import com.mylibrary.models.LoanTableModel;
-import com.mylibrary.tools.DataSourceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * @author Radim Kratochvil
  * @author Michael Le <lemichael@mail.muni.cz>
  */
 public class LoanForm {
+    private final static Logger log = LoggerFactory.getLogger(MainForm.class);
+	private BookManager bookManager;
+	private LoanManager loanManager;
+
+    private Customer customer;
+	private Long loanID = null;
+	private Long bookID = null;
+
+	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+	private TableRowSorter<BookTableModel> bookTableSorter;
+	private TableRowSorter<LoanTableModel> loanTableSorter;
+
     private JPanel defaultPanel;
     private JTable loanTable;
     private JTable availableBooksTable;
@@ -38,23 +44,10 @@ public class LoanForm {
 	private JButton exit;
 	private JLabel readerName;
 	private JTextField bookNameFilter;
-	private JButton findBook;
-	private JButton borrowBook;
+	private JButton findBookButton;
+	private JButton borrowBookButton;
 
-	private TableRowSorter<BookTableModel> bookTableSorter;
-	private TableRowSorter<LoanTableModel> loanTableSorter;
-
-	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-	private BookManager bookManager;
-	private CustomerManager customerManager;
-	private LoanManager loanManager;
-
-	private Long customerID = null;
-	private Long loanID = null;
-	private Long bookID = null;
-
-	public LoanForm(){
+	public LoanForm(BookManager bookManager, LoanManager loanManager, Customer customer) {
 		EventQueue.invokeLater(() -> {
 			JFrame frame = new JFrame("My Library");
 			frame.setContentPane(defaultPanel);
@@ -63,205 +56,175 @@ public class LoanForm {
 			frame.setVisible(true);
 		});
 
+        this.customer = customer;
+        updateTitle();
 
+        this.bookManager = bookManager;
+        this.loanManager = loanManager;
 
-		customerID = (long) 2;
+        addLoanListeners();
+        addAvailableBookListeners();
 
-
-
-
-		findBook.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				findBook.setEnabled(false);
-
-				new SwingWorker<Void, Void>() {
-					@Override
-					protected Void doInBackground() {
-						String nameFilter = bookNameFilter.getText();
-						if (nameFilter.equals("%")) nameFilter = "";
-
-						String authorFilter = bookAuthorFilter.getText();
-						if (authorFilter.equals("%")) authorFilter = "";
-
-						ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
-						filters.add(RowFilter.regexFilter(Pattern.quote(nameFilter), 1));
-						filters.add(RowFilter.regexFilter(Pattern.quote(authorFilter), 2));
-
-						RowFilter<BookTableModel, Object> filter = RowFilter.andFilter(filters);
-						bookTableSorter.setRowFilter(filter);
-
-						return null;
-					}
-
-					protected void done() {
-						findBook.setEnabled(true);
-					}
-				}.execute();
-			}
-		});
-
-		exit.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				Container frame = exit.getParent();
-				do
-					frame = frame.getParent();
-				while (!(frame instanceof JFrame));
-				((JFrame) frame).dispose();
-			}
-		});
-
-		loanTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (loanTable.getSelectedRow() > -1) {
-					loanID = selectedItemId(loanTable);
-					if (loanID == null) return;
-
-					returnBook.setEnabled(true);
-				} else {
-					returnBook.setEnabled(false);
-				}
-			}
-		});
-
-		returnBook.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(loanID != null && loanManager.findLoanById(loanID) == null) return;
-
-				returnBook.setEnabled(false);
-				new SwingWorker<Void, Void>() {
-					@Override
-					protected Void doInBackground() {
-						Loan loan;
-						if(loanID != null) loan = loanManager.findLoanById(loanID);
-						else return null;
-
-						Date today = new Date();
-						String todayString = dateFormat.format(today);
-						try {
-							today = dateFormat.parse(todayString);
-						} catch (ParseException e) {
-							throw new ServiceFailureException("Parser error exception.", e);
-						}
-
-						loan.setRealEndDate(today);
-
-						loanManager.updateLoan(loan);
-
-						return null;
-					}
-
-					protected void done() {
-						((LoanTableModel) loanTable.getModel()).loadData();
-						returnBook.setEnabled(true);
-					}
-				}.execute();
-			}
-		});
-
-		availableBooksTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (availableBooksTable.getSelectedRow() > -1) {
-					bookID = selectedItemId(availableBooksTable);
-					if (bookID == null) return;
-
-					borrowBook.setEnabled(true);
-				} else {
-					borrowBook.setEnabled(false);
-				}
-			}
-		});
-
-		borrowBook.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (bookID != null && bookManager.findBookById(bookID) == null) return;
-
-				borrowBook.setEnabled(false);
-				new SwingWorker<Void, Void>() {
-					@Override
-					protected Void doInBackground() {
-						Loan loan = new Loan();
-
-						loan.setCustomer(customerManager.findCustomerById(customerID));
-						loan.setBook(bookManager.findBookById(bookID));
-
-						Date today = new Date();
-						Date nextMonth;
-						String todayString = dateFormat.format(today);
-						String nextMonthString;
-
-						Calendar c = Calendar.getInstance();
-						c.setTime(today);
-						c.add(Calendar.MONTH, 1);
-						nextMonthString = dateFormat.format(c.getTime());
-
-						try {
-							today = dateFormat.parse(todayString);
-							nextMonth = dateFormat.parse(nextMonthString);
-
-						} catch (ParseException e) {
-							throw new ServiceFailureException("Parser error exception.", e);
-						}
-
-						loan.setStartDate(today);
-						loan.setEndDate(nextMonth);
-
-						loanManager.createLoan(loan);
-
-						return null;
-					}
-
-					protected void done() {
-						((BookTableModel) availableBooksTable.getModel()).loadData();
-						((LoanTableModel) loanTable.getModel()).loadData();
-						borrowBook.setEnabled(true);
-					}
-				}.execute();
-			}
-		});
+        initializeBookTable();
+        initializeLoanTable();
 	}
 
-	private void createUIComponents() throws IOException {
-		customerID = (long) 2;
 
-		try {
-			bookManager = new BookManagerImpl(DataSourceFactory.getDataSource());
-			customerManager = new CustomerManagerImpl(DataSourceFactory.getDataSource());
-			loanManager = new LoanManagerImpl(DataSourceFactory.getDataSource());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    // Listeners
+    private void addLoanListeners() {
+        // Return book
+        returnBook.addActionListener(e -> {
+            returnBook.setEnabled(false);
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    if (loanID == null) return null;
 
-		//readerName.setText(customerManager.findCustomerById(customerID).getName());
+                    Loan loan = loanManager.findLoanById(loanID);
+                    if (loan == null) return null;
 
-		createBookTable();
-		createLoanTable();
-	}
+                    Date today = new Date();
+                    String todayString = dateFormat.format(today);
+                    try {
+                        today = dateFormat.parse(todayString);
+                    } catch (ParseException e) {
+                        log.error("Date parse error." + e);
+                        throw new ServiceFailureException("Parser error exception.", e);
+                    }
 
-	private void createBookTable() throws IOException {
-		BookTableModel model = new BookTableModel(){
-			@Override
-			public void loadData() {
-				new SwingWorker<Void, Void>() {
-					@Override
-					protected Void doInBackground() {
-						setBooks(loanManager.findAllAvailableBooks());
-						return null;
-					}
+                    loan.setRealEndDate(today);
+                    loanManager.updateLoan(loan);
 
-					protected void done() {
-						fireTableDataChanged();
-					}
-				}.execute();
-			}
-		};
+                    return null;
+                }
 
-		availableBooksTable = new JTable();
+                protected void done() {
+                    getLoanTableModel().loadData();
+                    getBookTableModel().loadData();
+                    returnBook.setEnabled(true);
+                }
+            }.execute();
+        });
+
+        // Table selection
+        loanTable.getSelectionModel().addListSelectionListener(e -> {
+            if (loanTable.getSelectedRow() < 0) {
+                returnBook.setEnabled(false);
+            }
+
+            loanID = UICommon.getSelectedItemId(loanTable);
+            if (loanID == null) return;
+            returnBook.setEnabled(true);
+        });
+
+        // Exit form
+        exit.addActionListener(e -> {
+            Container frame = exit.getParent();
+            do {
+                frame = frame.getParent();
+            } while (!(frame instanceof JFrame));
+            ((JFrame) frame).dispose();
+        });
+    }
+
+    private void addAvailableBookListeners() {
+        // Find book
+        // TODO: Není potřeba SwingWorker?
+        findBookButton.addActionListener(e -> {
+            findBookButton.setEnabled(false);
+
+            String nameFilter = UICommon.getFilterValue(bookNameFilter);
+            String authorFilter = UICommon.getFilterValue(bookAuthorFilter);
+
+            ArrayList<RowFilter<Object, Object>> filters = new ArrayList<>();
+            filters.add(RowFilter.regexFilter(nameFilter, 1));
+            filters.add(RowFilter.regexFilter(authorFilter, 2));
+
+            RowFilter<BookTableModel, Object> filter = RowFilter.andFilter(filters);
+            bookTableSorter.setRowFilter(filter);
+        });
+
+        // Borrow book
+        borrowBookButton.addActionListener(e -> {
+            borrowBookButton.setEnabled(false);
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    if (bookID == null || bookManager.findBookById(bookID) == null) {
+                        return null;
+                    }
+
+                    Date today = new Date();
+                    Date nextMonth;
+
+                    String todayString = dateFormat.format(today);
+                    String nextMonthString;
+
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(today);
+                    c.add(Calendar.MONTH, 1);
+                    nextMonthString = dateFormat.format(c.getTime());
+
+                    try {
+                        today = dateFormat.parse(todayString);
+                        nextMonth = dateFormat.parse(nextMonthString);
+                    } catch (ParseException e) {
+                        log.error("Date parse error." + e);
+                        throw new ServiceFailureException("Parser error exception.", e);
+                    }
+
+                    Loan loan = new Loan();
+                    loan.setCustomer(customer);
+                    loan.setBook(bookManager.findBookById(bookID));
+                    loan.setStartDate(today);
+                    loan.setEndDate(nextMonth);
+                    loanManager.createLoan(loan);
+
+                    return null;
+                }
+
+                protected void done() {
+                    getBookTableModel().loadData();
+                    getLoanTableModel().loadData();
+                    borrowBookButton.setEnabled(true);
+                }
+            }.execute();
+        });
+
+        // Table selection
+        availableBooksTable.getSelectionModel().addListSelectionListener(e -> {
+            if (availableBooksTable.getSelectedRow() < 0) {
+                borrowBookButton.setEnabled(false);
+            }
+
+            bookID = UICommon.getSelectedItemId(availableBooksTable);
+            if (bookID == null) return;
+            borrowBookButton.setEnabled(true);
+        });
+    }
+
+
+    // Initialize tables
+    private void initializeLoanTable() {
+        LoanTableModel model = new LoanTableModel(loanManager, customer);
+
+        loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        loanTable.setModel(model);
+
+        loanTable.getColumnModel().getColumn(0).setPreferredWidth(25);
+        loanTable.getColumnModel().getColumn(1).setPreferredWidth(50);
+        loanTable.getColumnModel().getColumn(2).setPreferredWidth(100);
+        loanTable.getColumnModel().getColumn(3).setPreferredWidth(50);
+        loanTable.getColumnModel().getColumn(4).setPreferredWidth(125);
+        loanTable.getColumnModel().getColumn(5).setPreferredWidth(125);
+
+        loanTableSorter = new TableRowSorter<>(model);
+        loanTable.setRowSorter(loanTableSorter);
+    }
+
+	private void initializeBookTable() {
+		BookTableModel model = new AvailableBooksTableModel(bookManager, loanManager);
+
 		availableBooksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		availableBooksTable.setModel(model);
 
@@ -274,34 +237,19 @@ public class LoanForm {
 		availableBooksTable.setRowSorter(bookTableSorter);
 	}
 
-	private void createLoanTable() throws IOException {
-		LoanTableModel model = new LoanTableModel(customerID){};
 
-		loanTable = new JTable();
-		loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		loanTable.setModel(model);
+    // Common
+    private void updateTitle() {
+        readerName.setText(customer.getName());
+    }
 
-		loanTable.getColumnModel().getColumn(0).setPreferredWidth(25);
-		loanTable.getColumnModel().getColumn(1).setPreferredWidth(50);
-		loanTable.getColumnModel().getColumn(2).setPreferredWidth(100);
-		loanTable.getColumnModel().getColumn(3).setPreferredWidth(50);
-		loanTable.getColumnModel().getColumn(4).setPreferredWidth(125);
-		loanTable.getColumnModel().getColumn(5).setPreferredWidth(125);
 
-		loanTableSorter = new TableRowSorter<>(model);
-		loanTable.setRowSorter(loanTableSorter);
-	}
+    // Get table models
+    private LoanTableModel getLoanTableModel() {
+        return (LoanTableModel) loanTable.getModel();
+    }
 
-	private Long selectedItemId(JTable tbl) {
-		int rowIndex = tbl.getSelectedRow();
-		if(rowIndex < 0) {
-			return null;
-		}
-
-		return (Long) tbl.getValueAt(rowIndex, 0);
-	}
-
-	public void setCustomerID(Long id){
-		customerID = id;
-	}
+    private BookTableModel getBookTableModel() {
+        return (BookTableModel) availableBooksTable.getModel();
+    }
 }

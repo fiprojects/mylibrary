@@ -20,10 +20,10 @@ public class LoanTableModel extends AbstractTableModel {
 	private LoanManager loanManager;
 	private List<Loan> loans = new ArrayList<>();
 
-	public LoanTableModel(Long id) throws IOException {
-		customer = (new CustomerManagerImpl(DataSourceFactory.getDataSource())).findCustomerById(id);
-		loanManager = new LoanManagerImpl(DataSourceFactory.getDataSource());
-
+	public LoanTableModel(LoanManager loanManager, Customer customer) {
+		this.loanManager = loanManager;
+		this.customer = customer;
+        System.out.print(customer);
 		loadData();
 	}
 

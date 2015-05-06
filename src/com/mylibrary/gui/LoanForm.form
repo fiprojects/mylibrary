@@ -113,7 +113,7 @@
         </properties>
         <border type="none" title-resource-bundle="i18n" title-key="loansOfReader"/>
         <children>
-          <component id="e99b7" class="javax.swing.JTable" binding="loanTable" custom-create="true">
+          <component id="e99b7" class="javax.swing.JTable" binding="loanTable">
             <constraints/>
             <properties/>
           </component>
@@ -127,7 +127,7 @@
         <properties/>
         <border type="none" title-resource-bundle="i18n" title-key="availBooks"/>
         <children>
-          <component id="c6bc8" class="javax.swing.JTable" binding="availableBooksTable" custom-create="true">
+          <component id="c6bc8" class="javax.swing.JTable" binding="availableBooksTable">
             <constraints/>
             <properties/>
           </component>
@@ -186,7 +186,7 @@
                   <text value="%"/>
                 </properties>
               </component>
-              <component id="ea877" class="javax.swing.JButton" binding="findBook">
+              <component id="ea877" class="javax.swing.JButton" binding="findBookButton">
                 <constraints>
                   <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -260,7 +260,7 @@
               <text resource-bundle="i18n" key="newLoan"/>
             </properties>
           </component>
-          <component id="a95dd" class="javax.swing.JButton" binding="borrowBook">
+          <component id="a95dd" class="javax.swing.JButton" binding="borrowBookButton">
             <constraints>
               <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
               <forms defaultalign-horz="false"/>

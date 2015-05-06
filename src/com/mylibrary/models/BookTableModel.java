@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class BookTableModel extends AbstractTableModel {
     private BookManager manager;
-    private List<Book> books = new ArrayList<>();
+    protected List<Book> books = new ArrayList<>();
 
     public BookTableModel(BookManager bookManager) {
         this.manager = bookManager;
@@ -77,7 +77,7 @@ public class BookTableModel extends AbstractTableModel {
         new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
-				setBooks(manager.findAllBooks());
+				books = manager.findAllBooks();
                 return null;
             }
 
@@ -86,8 +86,4 @@ public class BookTableModel extends AbstractTableModel {
             }
         }.execute();
     }
-
-	public void setBooks(List<Book> books){
-		this.books = books;
-	}
 }
