@@ -22,9 +22,6 @@ import java.util.ArrayList;
  * @author Radim Kratochvil
  * @author Michael Le <lemichael@mail.muni.cz>
  */
-// TODO: Ověřit ošetření výjimek vyhazovaných databází
-// TODO: Proklikat, zda vše funguje po refaktoringu
-// TODO: Lokalizace data podle nastavení OS?
 public class MainForm {
     private final static Logger log = LoggerFactory.getLogger(MainForm.class);
     private final BookManager bookManager;
@@ -190,7 +187,6 @@ public class MainForm {
         });
 
         // Find book
-        // TODO: Není potřeba SwingWorker?
         findBookButton.addActionListener(e -> {
             String nameFilter = UICommon.getFilterValue(bookNameFilter);
             String authorFilter = UICommon.getFilterValue(bookAuthorFilter);
@@ -287,7 +283,6 @@ public class MainForm {
         });
 
         // Find reader
-        // TODO: Není potřeba SwingWorker?
         findReaderButton.addActionListener(e -> {
             String nameFilter = UICommon.getFilterValue(readerNameFilter);
 

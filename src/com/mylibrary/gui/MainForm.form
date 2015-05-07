@@ -89,7 +89,7 @@
                         </constraints>
                         <properties>
                           <icon value="toolbar_find.png"/>
-                          <label value="Hledat"/>
+                          <label resource-bundle="i18n" key="find"/>
                           <text resource-bundle="i18n" key="find"/>
                         </properties>
                       </component>
@@ -242,7 +242,7 @@
                         </constraints>
                         <properties>
                           <icon value="save.png"/>
-                          <label value="Uložit"/>
+                          <label resource-bundle="i18n" key="save"/>
                           <selected value="false"/>
                           <text resource-bundle="i18n" key="save"/>
                           <verifyInputWhenFocusTarget value="false"/>
@@ -316,7 +316,7 @@
                     <properties>
                       <actionCommand value=""/>
                       <icon value="check.png"/>
-                      <label value="Půjčovna →"/>
+                      <label resource-bundle="i18n" key="checkOut"/>
                       <text resource-bundle="i18n" key="checkOut"/>
                     </properties>
                   </component>
@@ -480,7 +480,7 @@
                         </constraints>
                         <properties>
                           <icon value="toolbar_find.png"/>
-                          <label value="Hledat"/>
+                          <label resource-bundle="i18n" key="find"/>
                           <selected value="false"/>
                           <text resource-bundle="i18n" key="find"/>
                         </properties>
@@ -685,9 +685,9 @@
                         </constraints>
                         <properties>
                           <icon value="save.png"/>
-                          <label value="Uložit"/>
+                          <label resource-bundle="i18n" key="save"/>
                           <selected value="false"/>
-                          <text value="Uložit"/>
+                          <text resource-bundle="i18n" key="save"/>
                           <verifyInputWhenFocusTarget value="false"/>
                         </properties>
                       </component>

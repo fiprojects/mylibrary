@@ -194,8 +194,8 @@
                 <properties>
                   <icon value="toolbar_find.png"/>
                   <iconTextGap value="2"/>
-                  <label value="Find"/>
-                  <text resource-bundle="i18n" key="find"/>
+                  <label resource-bundle="i18n" key="find"/>
+                  <text resource-bundle="i18n" key="checkOut"/>
                 </properties>
               </component>
               <component id="548df" class="javax.swing.JLabel">

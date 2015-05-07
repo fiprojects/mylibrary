@@ -24,10 +24,10 @@ import java.util.Date;
  */
 public class LoanForm {
     private final static Logger log = LoggerFactory.getLogger(MainForm.class);
-	private BookManager bookManager;
-	private LoanManager loanManager;
+	private final BookManager bookManager;
+	private final LoanManager loanManager;
 
-    private Customer customer;
+    private final Customer customer;
 	private Long loanID = null;
 	private Long bookID = null;
 
@@ -129,7 +129,6 @@ public class LoanForm {
 
     private void addAvailableBookListeners() {
         // Find book
-        // TODO: Není potřeba SwingWorker?
         findBookButton.addActionListener(e -> {
             findBookButton.setEnabled(false);
 
@@ -242,7 +241,6 @@ public class LoanForm {
     private void updateTitle() {
         readerName.setText(customer.getName());
     }
-
 
     // Get table models
     private LoanTableModel getLoanTableModel() {
