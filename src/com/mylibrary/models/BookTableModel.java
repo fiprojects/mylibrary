@@ -2,13 +2,10 @@ package com.mylibrary.models;
 
 import com.mylibrary.Book;
 import com.mylibrary.BookManager;
-import com.mylibrary.BookManagerImpl;
-import com.mylibrary.tools.DataSourceFactory;
 import com.mylibrary.tools.Localization;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
