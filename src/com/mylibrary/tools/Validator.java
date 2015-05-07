@@ -1,7 +1,5 @@
 package com.mylibrary.tools;
 
-import org.omg.CORBA.Environment;
-
 import javax.swing.*;
 
 /**
@@ -21,7 +19,7 @@ public class Validator {
 
     public boolean mandatory(JTextField input) {
         if(input.getText().trim().equals("")) {
-            validationErrors.append(Localization.get("mandatory") + " " + input.getName() + newLine);
+            validationErrors.append(Localization.get("mandatory")).append(" ").append(input.getName()).append(newLine);
             valid = false;
             return false;
         }
@@ -34,13 +32,13 @@ public class Validator {
         try {
             value = Integer.parseInt(input.getText());
         } catch(NumberFormatException e) {
-            validationErrors.append(Localization.get("invalidNumber") + " " + input.getName() + newLine);
+            validationErrors.append(Localization.get("invalidNumber")).append(" ").append(input.getName()).append(newLine);
             valid = false;
             return false;
         }
 
         if(value <= 0) {
-            validationErrors.append(Localization.get("invalidNumber") + " " + input.getName() + newLine);
+            validationErrors.append(Localization.get("invalidNumber")).append(" ").append(input.getName()).append(newLine);
             valid = false;
             return false;
         }
@@ -49,7 +47,7 @@ public class Validator {
     }
 
     public boolean getConclusion() {
-        if(valid == false) {
+        if(!valid) {
             JOptionPane.showMessageDialog(mainPanel, validationErrors.toString(), "My Library", JOptionPane.ERROR_MESSAGE);
         }
 

@@ -2,10 +2,8 @@ package com.mylibrary.tools;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 
